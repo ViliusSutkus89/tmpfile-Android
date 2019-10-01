@@ -1,0 +1,15 @@
+#!/bin/sh
+THIS_FILE=$(readlink -f "$0")
+BASEDIR=$(dirname "$THIS_FILE")
+
+ANDROID_DIR=$BASEDIR/android
+BUILD_DIR=$BASEDIR/build
+
+cd $ANDROID_DIR
+./gradlew assemble
+
+for build_target in $BUILD_DIR/cmake/*/*
+do
+  cmake --build $build_target --target install
+done
+
