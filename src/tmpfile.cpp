@@ -24,8 +24,7 @@
 #include <unistd.h>
 #include <string>
 #include <unordered_set>
-
-#include "tmpfile_export.h"
+#include <jni.h>
 
 class TmpFile {
 private:
@@ -96,16 +95,22 @@ public:
   }
 };
 
-namespace Tmpfile {
-  TMPFILE_EXPORT void set_tmpfile_dir(const char *tmpfile_dir) {
-    TmpFileManager::getInstance().set_tmpfile_dir(tmpfile_dir);
-  }
+extern "C" {
 
-  TMPFILE_EXPORT void cleanup_tmpfiles() {
-    return TmpFileManager::getInstance().cleanup_tmpfiles();
-  }
+JNIEXPORT void JNICALL
+Java_com_viliussutkus89_tmpfile_Tmpfile_set_1tmpfile_1dir(JNIEnv *env, jclass, jstring tmpfile_dir) {
+  const char *tmpfile_dir_c = env->GetStringUTFChars(tmpfile_dir, 0);
+  TmpFileManager::getInstance().set_tmpfile_dir(tmpfile_dir_c);
+  env->ReleaseStringUTFChars(tmpfile_dir, tmpfile_dir_c);
 }
 
-TMPFILE_EXPORT FILE *tmpfile() {
+JNIEXPORT void JNICALL
+Java_com_viliussutkus89_tmpfile_Tmpfile_cleanup_1tmpfiles(JNIEnv *, jclass) {
+  TmpFileManager::getInstance().cleanup_tmpfiles();
+}
+
+JNIEXPORT FILE *tmpfile() {
   return TmpFileManager::getInstance().create_tmpfile();
+}
+
 }
