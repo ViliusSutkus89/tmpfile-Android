@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.viliussutkus89.tmpfile">
     <application>
+        <provider
+            android:name=".TmpfileInitProvider"
+            android:authorities="${applicationId}.tmpfileinitprovider"
+            android:enabled="true"
+            android:exported="false" />
     </application>
-
 </manifest>
+
