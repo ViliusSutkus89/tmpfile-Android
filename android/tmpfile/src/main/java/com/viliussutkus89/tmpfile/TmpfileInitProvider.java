@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +24,8 @@ public final class TmpfileInitProvider extends ContentProvider {
     new Tmpfile();
   }
 
+  static final String TAG = "Tmpfile";
+
   public static void set_tmpfile_dir(Context ctx) {
     final File cacheDir = new File(ctx.getCacheDir(), "tmpfile");
     if (!cacheDir.exists()) {
@@ -33,7 +36,13 @@ public final class TmpfileInitProvider extends ContentProvider {
 
   @Override
   public boolean onCreate() {
-    set_tmpfile_dir(getContext());
+    Context ctx = getContext();
+    if (null == ctx) {
+      Log.e(TAG, "Failed to get Context in TmpfileInitProvider::onCreate()!\n"
+        + "tmpfile directory not set!");
+      return false;
+    }
+    set_tmpfile_dir(ctx);
     return true;
   }
 
