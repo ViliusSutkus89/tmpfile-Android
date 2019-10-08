@@ -7,5 +7,5 @@ project(tmpfile
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
-add_library(tmpfile SHARED src/tmpfile.cpp)
+add_library(tmpfile SHARED tmpfile.cpp)
 
