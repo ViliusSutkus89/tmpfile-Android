@@ -1,1 +1,1 @@
-include ':tmpfile'
+include ':tmpfile', ':tests'

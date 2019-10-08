@@ -17,4 +17,6 @@ rm_folder_if_exists android/.gradle
 rm_folder_if_exists android/build
 rm_folder_if_exists android/tmpfile/.cxx
 rm_folder_if_exists android/tmpfile/build
+rm_folder_if_exists android/tests/.cxx
+rm_folder_if_exists android/tests/build
 
