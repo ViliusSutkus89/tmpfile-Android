@@ -16,34 +16,21 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.io.File;
-
 public final class TmpfileInitProvider extends ContentProvider {
-  static {
-    // Call static{} block of Tmpfile.
-    new Tmpfile();
-  }
-
-  static final String TAG = "Tmpfile";
-
-  public static void set_tmpfile_dir(Context ctx) {
-    final File cacheDir = new File(ctx.getCacheDir(), "tmpfile");
-    if (!cacheDir.exists()) {
-      cacheDir.mkdirs();
-    }
-    Tmpfile.set_tmpfile_dir(cacheDir.getAbsolutePath());
-  }
+  private static final String s_TAG = "Tmpfile";
+  private final Tmpfile m_tmpfile = new Tmpfile();
 
   @Override
   public boolean onCreate() {
-    Context ctx = getContext();
-    if (null == ctx) {
-      Log.e(TAG, "Failed to get Context in TmpfileInitProvider::onCreate()!\n"
-        + "tmpfile directory not set!");
-      return false;
+    try {
+      m_tmpfile.setCacheDir(getContext().getCacheDir());
+      return true;
+    } catch (NullPointerException e) {
+      Log.e(s_TAG, "Failed to get Context in TmpfileInitProvider::onCreate()!");
+    } catch (Tmpfile.TmpfileDirNotExistsAndFailedToCreateException e) {
+      Log.e(s_TAG, "Failed to create directory for tmpfiles!");
     }
-    set_tmpfile_dir(ctx);
-    return true;
+    return false;
   }
 
   @Override

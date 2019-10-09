@@ -12,6 +12,8 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 
+import static com.viliussutkus89.tmpfile.Tmpfile.s_subfolderInCache;
+
 /*
 Sort tests by method name using @FixMethodOrder(MethodSorters.NAME_ASCENDING).
 Subsequent tests may crash, because they assume things from previous tests are working correctly.
@@ -25,7 +27,7 @@ public class TmpfileInstrumentedTests {
 
   private File getTmpfileDir() {
     final File cacheDir = InstrumentationRegistry.getInstrumentation().getTargetContext().getCacheDir();
-    return new File(cacheDir, "tmpfile");
+    return new File(cacheDir, s_subfolderInCache);
   }
 
   @Test
