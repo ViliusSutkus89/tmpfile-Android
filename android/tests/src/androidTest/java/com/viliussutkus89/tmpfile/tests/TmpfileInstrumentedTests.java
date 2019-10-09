@@ -39,6 +39,11 @@ public class TmpfileInstrumentedTests {
     assertTrue("Tmpfile directory is not writable!", tmpfileDir.canWrite());
   }
 
+  @Test
+  public void a1_noLeftoverTmpfiles() {
+    final File[] tmpfiles = getTmpfileDir().listFiles();
+    assertEquals("Leftover tmpfiles found!", tmpfiles.length, 0);
+  }
 
   @Test
   public void b1_openAndCloseTmpfile() {
@@ -55,10 +60,25 @@ public class TmpfileInstrumentedTests {
     assertTrue("Failed to read from previously written tmpfile!", write_and_readback_from_tmpfile());
   }
 
+  @Test
+  public void z1_tmpfilesDeletedOnClose() {
+    open_and_close_tmpfile();
+    final File[] tmpfiles = getTmpfileDir().listFiles();
+    assertEquals("Tmpfiles are not deleted after closing!", 0, tmpfiles.length);
+  }
+
+  @Test
+  public void z2_unclosedTmpfileNotGarbageCollected() {
+    open_and_not_close_tmpfile();
+    final File[] tmpfiles = getTmpfileDir().listFiles();
+    assertNotEquals("Unclosed tmpfile is deleted (it should not be)!", 1, tmpfiles.length);
+  }
 
   private native boolean open_and_close_tmpfile();
 
   private native boolean write_to_tmpfile();
 
   private native boolean write_and_readback_from_tmpfile();
+
+  private native boolean open_and_not_close_tmpfile();
 }

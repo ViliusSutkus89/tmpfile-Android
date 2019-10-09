@@ -105,5 +105,16 @@ Java_com_viliussutkus89_tmpfile_tests_TmpfileInstrumentedTests_write_1and_1readb
   return JNI_TRUE;
 }
 
+JNIEXPORT jboolean JNICALL
+Java_com_viliussutkus89_tmpfile_tests_TmpfileInstrumentedTests_open_1and_1not_1close_1tmpfile(JNIEnv*, jobject) {
+  FILE * fh = tmpfile();
+
+  if (nullptr == fh) {
+    __android_log_print(ANDROID_LOG_ERROR, TAG, "Failed to open tmpfile. errno: %d", errno);
+    return JNI_FALSE;
+  }
+
+  return JNI_TRUE;
+}
 
 }
