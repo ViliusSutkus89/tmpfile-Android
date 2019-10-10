@@ -1,38 +1,24 @@
 package com.viliussutkus89.tmpfile.tests;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.platform.app.InstrumentationRegistry;
 
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.FixMethodOrder;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
-import static com.viliussutkus89.tmpfile.Tmpfile.s_subfolderInCache;
-
-/*
-Sort tests by method name using @FixMethodOrder(MethodSorters.NAME_ASCENDING).
-Subsequent tests may crash, because they assume things from previous tests are working correctly.
-*/
 @RunWith(AndroidJUnit4.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TmpfileInstrumentedTests {
   static {
     System.loadLibrary("nativeUnitTests");
   }
 
-  private File getTmpfileDir() {
-    final File cacheDir = InstrumentationRegistry.getInstrumentation().getTargetContext().getCacheDir();
-    return new File(cacheDir, s_subfolderInCache);
-  }
-
   @Test
-  public void a0_tmpfileDirCreated() {
-    final File tmpfileDir = getTmpfileDir();
+  public void tmpfileDirCreated() {
+    final File tmpfileDir = TmpfileTestSuite.getTmpfileDir();
     assertTrue("Tmpfile directory does not exist!", tmpfileDir.exists());
     assertTrue("Tmpfile directory is not actually a directory!", tmpfileDir.isDirectory());
     assertTrue("Tmpfile directory is not readable!", tmpfileDir.canRead());
@@ -40,38 +26,30 @@ public class TmpfileInstrumentedTests {
   }
 
   @Test
-  public void a1_noLeftoverTmpfiles() {
-    final File[] tmpfiles = getTmpfileDir().listFiles();
-    assertEquals("Leftover tmpfiles found!", tmpfiles.length, 0);
-  }
-
-  @Test
-  public void b1_openAndCloseTmpfile() {
+  public void openAndCloseTmpfile() {
     assertTrue("Failed to open and close tmpfile!", open_and_close_tmpfile());
   }
 
   @Test
-  public void b2_writeToTmpfile() {
+  public void openAndCloseTmpfileTwice() {
+    assertTrue("Failed to open and close tmpfile once!", open_and_close_tmpfile());
+    assertTrue("Failed to open and close tmpfile for the second time!", open_and_close_tmpfile());
+  }
+
+  @Test
+  public void writeToTmpfile() {
     assertTrue("Failed to write to tmpfile!", write_to_tmpfile());
   }
 
   @Test
-  public void b3_writeAndReadbackFromTmpfile() {
+  public void writeAndReadbackFromTmpfile() {
     assertTrue("Failed to read from previously written tmpfile!", write_and_readback_from_tmpfile());
   }
 
   @Test
-  public void z1_tmpfilesDeletedOnClose() {
-    open_and_close_tmpfile();
-    final File[] tmpfiles = getTmpfileDir().listFiles();
-    assertEquals("Tmpfiles are not deleted after closing!", 0, tmpfiles.length);
-  }
-
-  @Test
-  public void z2_unclosedTmpfileNotGarbageCollected() {
+  @Ignore("On exit deletion of unclosed (leaked) tmpfiles not yet implemented.")
+  public void unclosedTmpfileNotGarbageCollected() {
     open_and_not_close_tmpfile();
-    final File[] tmpfiles = getTmpfileDir().listFiles();
-    assertNotEquals("Unclosed tmpfile is deleted (it should not be)!", 1, tmpfiles.length);
   }
 
   private native boolean open_and_close_tmpfile();
@@ -81,4 +59,5 @@ public class TmpfileInstrumentedTests {
   private native boolean write_and_readback_from_tmpfile();
 
   private native boolean open_and_not_close_tmpfile();
+
 }
