@@ -12,7 +12,7 @@ function rm_folder_if_exists() {
   fi
 }
 
-rm_folder_if_exists build
+rm_folder_if_exists release
 rm_folder_if_exists android/.gradle
 rm_folder_if_exists android/build
 rm_folder_if_exists android/tmpfile/.cxx
