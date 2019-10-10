@@ -3,8 +3,8 @@
     package="com.viliussutkus89.tmpfile">
     <application>
         <provider
-            android:name=".TmpfileInitProvider"
-            android:authorities="${applicationId}.tmpfileinitprovider"
+            android:name=".Tmpfile"
+            android:authorities="${applicationId}.tmpfile"
             android:enabled="true"
             android:exported="false" />
     </application>
