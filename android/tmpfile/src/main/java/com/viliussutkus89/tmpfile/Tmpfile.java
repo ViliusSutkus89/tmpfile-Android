@@ -40,8 +40,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public final class Tmpfile extends ContentProvider {
 
@@ -51,7 +49,9 @@ public final class Tmpfile extends ContentProvider {
 
   public static final String s_subfolderInCache = "tmpfiles";
   private static final String s_TAG = "Tmpfile";
-  private final List<FileObserver> m_observers = new ArrayList<>();
+
+  @SuppressWarnings("FieldCanBeLocal")
+  private FileObserver m_observer;
 
   @Override
   public boolean onCreate() {
@@ -61,33 +61,24 @@ public final class Tmpfile extends ContentProvider {
       return false;
     }
 
-    File tmpfileDir = new File(ctx.getCacheDir(), s_subfolderInCache);
+    final File tmpfileDir = new File(ctx.getCacheDir(), s_subfolderInCache);
     if (!tmpfileDir.exists() && !tmpfileDir.mkdirs()) {
       Log.e(s_TAG, "Failed to create directory for tmpfiles: " + tmpfileDir.getAbsolutePath());
       return false;
     }
 
-    m_observers.add(new FileCloseObserver(tmpfileDir));
+    m_observer = new FileObserver(tmpfileDir.getAbsolutePath(), FileObserver.CLOSE_WRITE) {
+      @Override
+      public void onEvent(int i, @Nullable String closedFileName) {
+        if (null != closedFileName) {
+          on_file_closed(new File(tmpfileDir, closedFileName).getAbsolutePath());
+        }
+      }
+    };
+    m_observer.startWatching();
 
     set_tmpfile_dir(tmpfileDir.getAbsolutePath());
     return true;
-  }
-
-  private class FileCloseObserver extends FileObserver {
-    private final File m_tmpfileFileDir;
-
-    public FileCloseObserver(@NonNull File tmpfileDir) {
-      super(tmpfileDir.getAbsolutePath(), FileObserver.CLOSE_WRITE);
-      m_tmpfileFileDir = tmpfileDir;
-      startWatching();
-    }
-
-    @Override
-    public void onEvent(int i, @Nullable String closedFileName) {
-      if (null != closedFileName) {
-        on_file_closed(new File(m_tmpfileFileDir, closedFileName).getAbsolutePath());
-      }
-    }
   }
 
   private static native void set_tmpfile_dir(String tmpfile_dir);
