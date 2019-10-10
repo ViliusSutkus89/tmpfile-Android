@@ -4,8 +4,11 @@
     <application>
         <provider
             android:name=".Tmpfile"
+            android:label="Tmpfile initializer. Provides path to app cache directory for tmpfile() library call"
             android:authorities="${applicationId}.tmpfile"
             android:enabled="true"
+            android:initOrder="65535"
+            android:permission="false"
             android:exported="false" />
     </application>
 </manifest>
