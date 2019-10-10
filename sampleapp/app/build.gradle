@@ -1,0 +1,33 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
+    defaultConfig {
+        applicationId "com.viliussutkus89.tmpfile.sampleapp"
+        minSdkVersion 16
+        targetSdkVersion 29
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
+    }
+}
+
+// Extract shared .so libraries to build folder
+// So that they could be linked against in CMake
+task extractLibtmpfileSoForLinkingInCMake(type: Copy) {
+    from zipTree("${project.rootDir}/app/libs/tmpfile.aar")
+    into "${project.buildDir}/tmpfile/"
+    include "jni/**"
+}
+preBuild.dependsOn extractLibtmpfileSoForLinkingInCMake
+
+dependencies {
+    implementation files('libs/tmpfile.aar')
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+}
+

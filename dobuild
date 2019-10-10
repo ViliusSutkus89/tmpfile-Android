@@ -6,8 +6,12 @@ THIS_FILE=$(readlink -f "$0")
 BASEDIR=$(dirname "$THIS_FILE")
 
 ANDROID_DIR=$BASEDIR/android
-BUILD_DIR=$BASEDIR/build
+SAMPLE_APP_DIR=$BASEDIR/sampleapp
 
 cd $ANDROID_DIR
+./gradlew build
+
+cp $ANDROID_DIR/tmpfile/build/outputs/aar/tmpfile-release.aar $SAMPLE_APP_DIR/app/libs/tmpfile.aar
+cd $SAMPLE_APP_DIR
 ./gradlew build
 
