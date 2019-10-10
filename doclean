@@ -23,4 +23,5 @@ rm_folder_if_exists sampleapp/.gradle
 rm_folder_if_exists sampleapp/build
 rm_folder_if_exists sampleapp/app/.cxx
 rm_folder_if_exists sampleapp/app/build
+rm_folder_if_exists sampleapp/app/libs/tmpfile.aar
 
