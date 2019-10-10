@@ -23,7 +23,7 @@
 #include <cstdio>
 #include <unistd.h>
 #include <string>
-#include <unordered_set>
+#include <unordered_map>
 #include <jni.h>
 
 class TmpFile {
@@ -33,11 +33,21 @@ private:
   FILE *m_handle = nullptr;
 
 public:
-  explicit TmpFile(const std::string &path_template) : m_path(path_template) {
+  explicit TmpFile(std::string_view path_template) : m_path(path_template) {
     m_descriptor = mkstemp(&m_path[0]);
     if (-1 != m_descriptor) {
       m_handle = fdopen(m_descriptor, "w+b");
     }
+  }
+
+  TmpFile(TmpFile && source) noexcept {
+    m_path = std::move(source.m_path);
+
+    m_descriptor = source.m_descriptor;
+    source.m_descriptor = -1;
+
+    m_handle = source.m_handle;
+    source.m_handle = nullptr;
   }
 
   ~TmpFile() {
@@ -49,26 +59,19 @@ public:
     }
   }
 
+  std::string_view get_path() const {
+    return m_path;
+  }
+
   FILE *get_handle() const {
     return m_handle;
   }
-
-  bool operator==(const TmpFile &af) const {
-    return 0 == m_path.compare(af.m_path);
-  }
-
-  class Hash {
-  public:
-    size_t operator()(const TmpFile &af) const {
-      return std::hash<std::string>{}(af.m_path);
-    }
-  };
 };
 
 class TmpFileManager {
 private:
   std::string m_tmpfile_path_template = "/data/local/tmp/tmpfile-XXXXXX";
-  std::unordered_set<TmpFile, TmpFile::Hash> m_created_tmpfiles;
+  std::unordered_map<std::string, TmpFile> m_created_tmpfiles;
 
   TmpFileManager() = default;
 
@@ -83,15 +86,17 @@ public:
   }
 
   FILE *create_tmpfile() {
-    auto newly_create_file = m_created_tmpfiles.emplace(m_tmpfile_path_template);
-    if (!newly_create_file.second) {
+    TmpFile t(m_tmpfile_path_template);
+    auto path = t.get_path();
+    auto newly_created_file = m_created_tmpfiles.insert(std::make_pair(path, std::move(t)));
+    if (!newly_created_file.second) {
       return nullptr;
     }
-    return newly_create_file.first->get_handle();
+    return newly_created_file.first->second.get_handle();
   }
 
-  void cleanup_tmpfiles() {
-    m_created_tmpfiles.clear();
+  void tmpfile_closed(const std::string & full_closed_file_path) {
+    m_created_tmpfiles.erase(full_closed_file_path);
   }
 };
 
@@ -99,14 +104,17 @@ extern "C" {
 
 JNIEXPORT void JNICALL
 Java_com_viliussutkus89_tmpfile_Tmpfile_set_1tmpfile_1dir(JNIEnv *env, jclass, jstring tmpfile_dir) {
-  const char *tmpfile_dir_c = env->GetStringUTFChars(tmpfile_dir, 0);
+  const char *tmpfile_dir_c = env->GetStringUTFChars(tmpfile_dir, nullptr);
   TmpFileManager::getInstance().set_tmpfile_dir(tmpfile_dir_c);
   env->ReleaseStringUTFChars(tmpfile_dir, tmpfile_dir_c);
 }
 
 JNIEXPORT void JNICALL
-Java_com_viliussutkus89_tmpfile_Tmpfile_cleanup_1tmpfiles(JNIEnv *, jclass) {
-  TmpFileManager::getInstance().cleanup_tmpfiles();
+Java_com_viliussutkus89_tmpfile_Tmpfile_on_1file_1closed(JNIEnv *env, jclass,
+                                                         jstring file_path) {
+  const char *file_path_c = env->GetStringUTFChars(file_path, nullptr);
+  TmpFileManager::getInstance().tmpfile_closed(file_path_c);
+  env->ReleaseStringUTFChars(file_path, file_path_c);
 }
 
 JNIEXPORT FILE *tmpfile() {
