@@ -20,7 +20,7 @@ android {
 task extractLibtmpfileSoForLinkingInCMake(type: Copy) {
     from zipTree("${project.rootDir}/app/libs/tmpfile.aar")
     into "${project.buildDir}/tmpfile/"
-    include "jni/**"
+    include "jni/**/libtmpfile.so"
 }
 preBuild.dependsOn extractLibtmpfileSoForLinkingInCMake
 
