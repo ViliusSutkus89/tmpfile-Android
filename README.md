@@ -30,6 +30,10 @@ This library provides alternative *tmpfile* implementation based on [```mkstemp(
 By default temporary files are created in */data/local/tmp*.
 Function `Tmpfile::set_tmpfile_dir(const char *tmpfile_dir)` allows temporary file creation in cache folder.
 
+## Requirements for users
+This library requires Android API level 16 (Jelly Bean 4.1.x) or newer.
+Such a requirement is imposed by the current versions of Android Native Development Kit.
+
 ## Usage
 On Java side:
 1. Load tmpfile library.
