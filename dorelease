@@ -6,7 +6,6 @@ shopt -s failglob
 
 THIS_FILE=$(readlink -f "$0")
 BASEDIR=$(dirname "$THIS_FILE")
-ANDROID_DIR=$BASEDIR/android
 RELEASE_DIR=$BASEDIR/release
 
 $BASEDIR/doclean
@@ -15,7 +14,7 @@ mkdir --parents $RELEASE_DIR
 # Extract project version from build.gradle
 # Format:
 # android { .... defaultConfig { ... versionName "0.9" ... } ... }
-GRADLE_FILE=$ANDROID_DIR/tmpfile/build.gradle
+GRADLE_FILE=$BASEDIR/tmpfile/build.gradle
 version_format='([0-9\.]+)'
 expression="s/.*?versionName \"$version_format\".*?/\1/p"
 VERSION=$(tr "\n" ' ' < $GRADLE_FILE | sed -En "--expression=$expression")
@@ -25,11 +24,11 @@ TAR_SOURCE=$RELEASE_DIR/$PROJECT-$VERSION-source.tar
 tar --create --file $TAR_SOURCE --directory=$BASEDIR $(git ls-tree -r master --name-only)
 xz $TAR_SOURCE -9
 
-cd $ANDROID_DIR
+cd $BASEDIR
 ./gradlew build
 
 AAR=$RELEASE_DIR/$PROJECT-$VERSION.aar
-cp $ANDROID_DIR/tmpfile/build/outputs/aar/$PROJECT-release.aar $AAR
+cp $BASEDIR/tmpfile/build/outputs/aar/$PROJECT-release.aar $AAR
 
 cd $RELEASE_DIR
 

@@ -1,1 +1,6 @@
 /release
+/.gradle
+/.idea
+*.iml
+/local.properties
+/build

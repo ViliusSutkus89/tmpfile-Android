@@ -28,7 +28,7 @@ This library provides alternative *tmpfile* implementation based on [```mkstemp(
 Directory */data/local/tmp* is used as a hardcoded default location.
 
 Proper storage location is per-application cache directory, obtained at runtime in Java side using [`context.getCacheDir()`](https://developer.android.com/reference/android/content/Context.html#getCacheDir()).  
-[Tmpfile.java](/android/tmpfile/src/main/java/com/viliussutkus89/tmpfile/Tmpfile.java) implements a *ContentProvider*,
+[Tmpfile.java](/tmpfile/src/main/java/com/viliussutkus89/tmpfile/Tmpfile.java) implements a *ContentProvider*,
 which executes automatically on application startup with a goal to obtain said directory, to be used in subsequent *tmpfile* function calls.
 
 Glibc's *tmpfile* automatically deletes created temporary files when they are closed.

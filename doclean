@@ -13,12 +13,12 @@ function rm_folder_if_exists() {
 }
 
 rm_folder_if_exists release
-rm_folder_if_exists android/.gradle
-rm_folder_if_exists android/build
-rm_folder_if_exists android/tmpfile/.cxx
-rm_folder_if_exists android/tmpfile/build
-rm_folder_if_exists android/tests/.cxx
-rm_folder_if_exists android/tests/build
+rm_folder_if_exists .gradle
+rm_folder_if_exists build
+rm_folder_if_exists tmpfile/.cxx
+rm_folder_if_exists tmpfile/build
+rm_folder_if_exists tests/.cxx
+rm_folder_if_exists tests/build
 rm_folder_if_exists sampleapp/.gradle
 rm_folder_if_exists sampleapp/build
 rm_folder_if_exists sampleapp/app/.cxx
