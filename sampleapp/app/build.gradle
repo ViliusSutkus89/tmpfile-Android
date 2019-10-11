@@ -15,7 +15,7 @@ android {
     }
 }
 
-// Extract shared .so libraries to build folder
+// Extract shared .so libraries to build directory
 // So that they could be linked against in CMake
 task extractLibtmpfileSoForLinkingInCMake(type: Copy) {
     from zipTree("${project.rootDir}/app/libs/tmpfile.aar")
