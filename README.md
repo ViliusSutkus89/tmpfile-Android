@@ -94,7 +94,7 @@ target_link_libraries(native-lib tmpfile)
 ## Issues
 Glibc's *tmpfile* automatically deletes temporary files when they are closed or on program termination.
 Temporary files created by this library are automatically deleted when they are closed.
-Garbage collection on program termination is not currently available.
+Garbage collection on program termination is not currently available (issue #1).
 
 To work around this limitation, close your temporary files when you are done using them:
 ```C++
