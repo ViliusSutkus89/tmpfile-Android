@@ -2,6 +2,7 @@
 POSIX C library provides [`FILE *tmpfile(void)`](https://linux.die.net/man/3/tmpfile) function.
 > The **tmpfile()** function opens a unique temporary file in binary read/write (w+b) mode.  
 > The file will be automatically deleted when it is closed or the program terminates.  
+> POSIX.1-2001 specifies: an error message may be written to stdout if the stream cannot be opened.  
 > The standard does not specify the directory that **tmpfile()** will use.  
 > Glibc will try the path prefix P_tmpdir defined in <stdio.h>, and if that fails the directory /tmp.
 
@@ -12,6 +13,8 @@ Bionic (Android's equivalent of glibc) also provides this function.
 Bionic's *tmpfile*, just like glibc's *tmpfile*, attempts to create temporary files in */tmp*.
 This is problematic, because */tmp* does not exist on Android and cannot be created by non-root users.
 Lack of */tmp* results in failure of *tmpfile* function.
+
+Bionic's *tmpfile* interprets the word "may" as "may or may not" and does not print any error messages to *stdout* alerting the user that such an error occurred.
 
 Numerous libraries rely on said function. None of them can be used on Android successfully.
 Porting such libraries would require either:
