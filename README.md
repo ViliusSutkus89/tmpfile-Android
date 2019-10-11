@@ -6,20 +6,20 @@ POSIX C library provides [`FILE *tmpfile(void)`](https://linux.die.net/man/3/tmp
 > The standard does not specify the directory that **tmpfile()** will use.  
 > Glibc will try the path prefix P_tmpdir defined in <stdio.h>, and if that fails the directory /tmp.
 
-Bionic (Android's equivalent of glibc) also provides this function.
+Bionic (Android's equivalent of Glibc) also provides this function.
 
-## The problem - /tmp folder
+## The problem - /tmp directory
 
-Bionic's *tmpfile*, just like glibc's *tmpfile*, attempts to create temporary files in */tmp*.
-This is problematic, because */tmp* does not exist on Android and cannot be created by non-root users.
+Bionic's *tmpfile*, just like Glibc's *tmpfile*, attempts to create temporary files in */tmp*.
+This is problematic, because */tmp* does not exist on Android and cannot be created by regular applications.
 Lack of */tmp* results in failure of *tmpfile* function.
 
 Bionic's *tmpfile* interprets the word "may" as "may or may not" and does not print any error messages to *stdout* alerting the user that such an error occurred.
 
 Numerous libraries rely on said function. None of them can be used on Android successfully.
-Porting such libraries would require either:
-* Updating them to not use this particular standard C library function,
-* Implementing an alternative *tmpfile* function.
+Porting such libraries would require either to:
+* Patch them to not use this particular function,
+* Implement an alternative *tmpfile* implementation.
 
 ## Workaround
 This library provides alternative *tmpfile* implementation based on [```mkstemp(char *template)```](https://linux.die.net/man/3/mkstemp).
