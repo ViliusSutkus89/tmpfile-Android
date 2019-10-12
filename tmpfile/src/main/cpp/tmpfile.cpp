@@ -52,7 +52,6 @@ public:
 
   ~TmpFile() {
     if (-1 != m_descriptor) {
-      close(m_descriptor);
       if (!m_path.empty()) {
         std::remove(m_path.c_str());
       }
