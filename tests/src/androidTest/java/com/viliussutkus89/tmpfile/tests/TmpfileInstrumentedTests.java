@@ -47,6 +47,15 @@ public class TmpfileInstrumentedTests {
   }
 
   @Test
+  public void writeAndReadbackLotsOfData() {
+    int oneMeg = 1024 * 1024;
+    assertTrue("Failed to write and readback one megabyte!", write_and_readback_lots_of_data(oneMeg));
+
+    int sixtyFourMegs = 64 * oneMeg;
+    assertTrue("Failed to write and read back 64 megabytes!", write_and_readback_lots_of_data(sixtyFourMegs));
+  }
+
+  @Test
   @Ignore("On exit deletion of unclosed (leaked) tmpfiles not yet implemented.")
   public void unclosedTmpfileNotGarbageCollected() {
     open_and_not_close_tmpfile();
@@ -57,6 +66,8 @@ public class TmpfileInstrumentedTests {
   private native boolean write_to_tmpfile();
 
   private native boolean write_and_readback_from_tmpfile();
+
+  private native boolean write_and_readback_lots_of_data(int bytes);
 
   private native boolean open_and_not_close_tmpfile();
 
