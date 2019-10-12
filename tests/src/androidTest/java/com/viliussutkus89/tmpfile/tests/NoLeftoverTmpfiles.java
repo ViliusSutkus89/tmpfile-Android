@@ -8,9 +8,9 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(AndroidJUnit4.class)
-public class NoLeftoverTmpfilesAfterTests {
+public class NoLeftoverTmpfiles {
   @Test
   public void noLeftoverTmpfiles() {
-    assertEquals("Found Leftover tmpfiles after executing tests!", 0, TmpfileTestSuite.getTmpfiles().length);
+    assertEquals("Found leftover tmpfiles!", 0, TmpfileTestSuite.getTmpfiles().length);
   }
 }

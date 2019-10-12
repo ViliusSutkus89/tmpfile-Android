@@ -11,19 +11,15 @@ import static com.viliussutkus89.tmpfile.Tmpfile.s_subfolderInCache;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  NoLeftoverTmpfilesBeforeTests.class,
   TmpfileInstrumentedTests.class,
-  NoLeftoverTmpfilesAfterTests.class
+  NoLeftoverTmpfiles.class
 })
 public class TmpfileTestSuite {
-
   public static File getTmpfileDir() {
     File cacheDir = InstrumentationRegistry.getInstrumentation().getTargetContext().getCacheDir();
     return new File(cacheDir, s_subfolderInCache);
   }
-
   public static File[] getTmpfiles() {
     return getTmpfileDir().listFiles();
   }
-
 }

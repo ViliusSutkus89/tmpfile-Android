@@ -33,7 +33,6 @@ import android.content.Context;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.FileObserver;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -50,9 +49,6 @@ public final class Tmpfile extends ContentProvider {
   public static final String s_subfolderInCache = "tmpfiles";
   private static final String s_TAG = "Tmpfile";
 
-  @SuppressWarnings("FieldCanBeLocal")
-  private FileObserver m_observer;
-
   @Override
   public boolean onCreate() {
     Context ctx = getContext();
@@ -61,29 +57,16 @@ public final class Tmpfile extends ContentProvider {
       return false;
     }
 
-    final File tmpfileDir = new File(ctx.getCacheDir(), s_subfolderInCache);
+    File tmpfileDir = new File(ctx.getCacheDir(), s_subfolderInCache);
     if (!tmpfileDir.exists() && !tmpfileDir.mkdirs()) {
       Log.e(s_TAG, "Failed to create directory for tmpfiles: " + tmpfileDir.getAbsolutePath());
       return false;
     }
-
-    m_observer = new FileObserver(tmpfileDir.getAbsolutePath(), FileObserver.CLOSE_WRITE) {
-      @Override
-      public void onEvent(int i, @Nullable String closedFileName) {
-        if (null != closedFileName) {
-          on_file_closed(new File(tmpfileDir, closedFileName).getAbsolutePath());
-        }
-      }
-    };
-    m_observer.startWatching();
-
     set_tmpfile_dir(tmpfileDir.getAbsolutePath());
     return true;
   }
 
   private static native void set_tmpfile_dir(String tmpfile_dir);
-
-  private static native void on_file_closed(String file_path);
 
   /* Required methods for ContentProvider */
 

@@ -2,7 +2,6 @@ package com.viliussutkus89.tmpfile.tests;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -56,9 +55,8 @@ public class TmpfileInstrumentedTests {
   }
 
   @Test
-  @Ignore("On exit deletion of unclosed (leaked) tmpfiles not yet implemented.")
-  public void unclosedTmpfileNotGarbageCollected() {
-    open_and_not_close_tmpfile();
+  public void openAndLeakTmpfile() {
+    assertTrue("Failed to open and not close (leak) tmpfile!", open_and_not_close_tmpfile());
   }
 
   private native boolean open_and_close_tmpfile();
