@@ -11,6 +11,12 @@ function rm_folder_if_exists() {
     rm -r $BASEDIR/$1
   fi
 }
+function rm_file_if_exists() {
+  if test -f $BASEDIR/$1
+  then
+    rm $BASEDIR/$1
+  fi
+}
 
 rm_folder_if_exists release
 rm_folder_if_exists .gradle
@@ -23,5 +29,5 @@ rm_folder_if_exists sampleapp/.gradle
 rm_folder_if_exists sampleapp/build
 rm_folder_if_exists sampleapp/app/.cxx
 rm_folder_if_exists sampleapp/app/build
-rm_folder_if_exists sampleapp/app/libs/tmpfile.aar
+rm_file_if_exists sampleapp/app/libs/tmpfile.aar
 
