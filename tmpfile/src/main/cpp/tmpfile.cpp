@@ -21,10 +21,15 @@
 
 #include <cstdio>
 #include <unistd.h>
+#include <atomic>
 #include <string>
 #include <jni.h>
+#include <android/log.h>
 
 static std::string s_tmpfile_path_template("/data/local/tmp/tmpfile-XXXXXX");
+static std::atomic_bool s_path_is_set (false);
+
+static const char * TAG = "tmpfile";
 
 extern "C" {
 
@@ -32,12 +37,20 @@ JNIEXPORT void JNICALL
 Java_com_viliussutkus89_tmpfile_Tmpfile_set_1tmpfile_1dir(JNIEnv *env, jclass, jstring tmpfile_dir) {
   const char *tmpfile_dir_c = env->GetStringUTFChars(tmpfile_dir, nullptr);
   s_tmpfile_path_template = std::string(tmpfile_dir_c) + "/tmpfile-XXXXXX";
+  s_path_is_set.store(true, std::memory_order_release);
   env->ReleaseStringUTFChars(tmpfile_dir, tmpfile_dir_c);
 }
 
 JNIEXPORT FILE *tmpfile() {
   FILE * handle = nullptr;
+
+  if (!s_path_is_set.load(std::memory_order_acquire)) {
+    __android_log_print(ANDROID_LOG_ERROR, TAG, "tmpfile() called before tmpfile directory was set."
+                                                "Expect a failure if /data/local/tmp is unavailable.");
+  }
+
   std::string path = s_tmpfile_path_template;
+
   int descriptor = mkstemp(&path[0]);
   if (-1 != descriptor) {
     handle = fdopen(descriptor, "w+b");
