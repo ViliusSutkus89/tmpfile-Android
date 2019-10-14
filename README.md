@@ -62,7 +62,7 @@ Loading tmpfile library is done in three (read: four) steps:
 * Linking your native (C / C++) binaries against *tmpfile* library (libtmpfile.so). This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
 
 #### Dependency in Gradle
-[sampleapp/app/build/build.gradle](sampleapp/app/build/build.gradle) contains code to load the library as a dependency in Gradle.
+[sampleapp/app/build.gradle](sampleapp/app/build.gradle) contains code to load the library as a dependency in Gradle.
 ```gradle
 dependencies {
     implementation files('libs/tmpfile-1.0.0.aar')
