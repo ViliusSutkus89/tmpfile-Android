@@ -10,7 +10,7 @@ SAMPLE_APP_DIR=$BASEDIR/sampleapp
 cd $BASEDIR
 ./gradlew build
 
-cp $BASEDIR/tmpfile/build/outputs/aar/tmpfile-release.aar $SAMPLE_APP_DIR/app/libs/tmpfile.aar
+cp $BASEDIR/tmpfile/build/outputs/aar/tmpfile-release.aar $SAMPLE_APP_DIR/app/libs/tmpfile-1.0.0.aar
 cd $SAMPLE_APP_DIR
 ./gradlew build
 

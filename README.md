@@ -57,15 +57,15 @@ Such a requirement is imposed by the current versions of Android Native Developm
 Library provides a proof of concept [sample application](/sampleapp).
 
 Loading tmpfile library is done in three (read: four) steps:
-* Downloading the library to app/libs/tmpfile-0.9.aar.
-* Including app/libs/tmpfile-0.9.aar as a dependency in Gradle. This step bundles Tmpfile.java and libtmpfile.so into your application's APK.
+* Downloading the library to app/libs/tmpfile-1.0.0.aar.
+* Including app/libs/tmpfile-1.0.0.aar as a dependency in Gradle. This step bundles Tmpfile.java and libtmpfile.so into your application's APK.
 * Linking your native (C / C++) binaries against *tmpfile* library (libtmpfile.so). This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
 
 #### Dependency in Gradle
 [sampleapp/app/build/build.gradle](sampleapp/app/build/build.gradle) contains code to load the library as a dependency in Gradle.
 ```gradle
 dependencies {
-    implementation files('libs/tmpfile-0.9.aar')
+    implementation files('libs/tmpfile-1.0.0.aar')
     ...
 }
 ```
@@ -76,10 +76,10 @@ Sadly, native code (through CMake) is compiled and linked before Gradle extracts
 This makes linking against native libraries (.so files), delivered as Android libraries (.aar) through Gradle, somewhat problematic.
 
 As a workaround, sample application implements a Gradle task named *extractLibtmpfileSoForLinkingInCMake*, which is executed before *preBuild* task.
-Task extractLibtmpfileSoForLinkingInCMake extracts native libraries (.so files) from tmpfile-0.9.aar into application's build directory, so that they could be linked against in CMake.
+Task extractLibtmpfileSoForLinkingInCMake extracts native libraries (.so files) from tmpfile-1.0.0.aar into application's build directory, so that they could be linked against in CMake.
 ```gradle
 task extractLibtmpfileSoForLinkingInCMake(type: Copy) {
-    from zipTree("${project.rootDir}/app/libs/tmpfile-0.9.aar")
+    from zipTree("${project.rootDir}/app/libs/tmpfile-1.0.0.aar")
     into "${project.buildDir}/tmpfile/"
     include "jni/**/libtmpfile.so"
 }

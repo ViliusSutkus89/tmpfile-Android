@@ -19,14 +19,14 @@ android {
 // Extract shared .so libraries to build directory
 // So that they could be linked against in CMake
 task extractLibtmpfileSoForLinkingInCMake(type: Copy) {
-    from zipTree("${project.rootDir}/app/libs/tmpfile.aar")
+    from zipTree("${project.rootDir}/app/libs/tmpfile-1.0.0.aar")
     into "${project.buildDir}/tmpfile/"
     include "jni/**/libtmpfile.so"
 }
 preBuild.dependsOn extractLibtmpfileSoForLinkingInCMake
 
 dependencies {
-    implementation files('libs/tmpfile.aar')
+    implementation files('libs/tmpfile-1.0.0.aar')
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
