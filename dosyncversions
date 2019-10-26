@@ -18,7 +18,7 @@ BASEDIR=$(dirname "$THIS_FILE")
 # android { .... defaultConfig { ... versionName "1.0.0" ... } ... }
 GRADLE_FILE=$BASEDIR/lib/build.gradle
 version_format='([0-9\.]+)'
-expression="s/.*?versionName \"$version_format\".*?/\1/p"
+expression="s/version \= '$version_format'.*?/\1/p"
 VERSION=$(tr "\n" ' ' < $GRADLE_FILE | sed -En "--expression=$expression")
 
 aar_file_search="tmpfile-android-$version_format.aar"
