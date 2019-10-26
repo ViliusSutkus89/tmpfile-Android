@@ -1,0 +1,25 @@
+name: Release build
+
+on: release
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    env:
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    - name: Assemble Release
+      run: ./gradlew assembleRelease
+
+    - name: Upload to Bintray
+      run: ./gradlew bintrayUpload
+      env:
+        BINTRAY_API_USER: ${{ secrets.BINTRAY_API_USER }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+
