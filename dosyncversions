@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# This project contains several places which refer to string "tmpfile-1.0.0.aar"
-# This script parses project version from tmpfile/build.gradle and updates:
+# This project contains several places which refer to string "tmpfile-Android-1.0.0.aar"
+# This script parses project version from tmpfile-Android/build.gradle and updates:
 # README.md
 # build.gradle of sampleapp,
 # dobuild-sampleapp
@@ -16,13 +16,13 @@ BASEDIR=$(dirname "$THIS_FILE")
 # Extract project version from build.gradle
 # Format:
 # android { .... defaultConfig { ... versionName "1.0.0" ... } ... }
-GRADLE_FILE=$BASEDIR/tmpfile/build.gradle
+GRADLE_FILE=$BASEDIR/lib/build.gradle
 version_format='([0-9\.]+)'
 expression="s/.*?versionName \"$version_format\".*?/\1/p"
 VERSION=$(tr "\n" ' ' < $GRADLE_FILE | sed -En "--expression=$expression")
 
-aar_file_search="tmpfile-$version_format.aar"
-aar_file_replace="tmpfile-$VERSION.aar"
+aar_file_search="tmpfile-android-$version_format.aar"
+aar_file_replace="tmpfile-android-$VERSION.aar"
 expression="s/$aar_file_search/$aar_file_replace/g"
 
 README_FILE=$BASEDIR/README.md

@@ -16,6 +16,11 @@ android {
         }
     }
     ndkVersion "20.0.5594570"
+    libraryVariants.all {
+        it.outputs.all {
+            outputFileName = "${rootProject.name}-${it.name}.aar"
+        }
+    }
 }
 
 dependencies {

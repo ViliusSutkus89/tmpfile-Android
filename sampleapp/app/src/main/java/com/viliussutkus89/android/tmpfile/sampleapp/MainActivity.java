@@ -1,4 +1,4 @@
-package com.viliussutkus89.tmpfile.sampleapp;
+package com.viliussutkus89.android.tmpfile.sampleapp;
 
 import android.os.Bundle;
 

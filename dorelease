@@ -1,5 +1,5 @@
 #!/bin/sh
-PROJECT='tmpfile'
+PROJECT='tmpfile-Android'
 
 set -euo pipefail
 shopt -s failglob
@@ -14,7 +14,7 @@ mkdir --parents $RELEASE_DIR
 # Extract project version from build.gradle
 # Format:
 # android { .... defaultConfig { ... versionName "0.9" ... } ... }
-GRADLE_FILE=$BASEDIR/tmpfile/build.gradle
+GRADLE_FILE=$BASEDIR/$PROJECT/build.gradle
 version_format='([0-9\.]+)'
 expression="s/.*?versionName \"$version_format\".*?/\1/p"
 VERSION=$(tr "\n" ' ' < $GRADLE_FILE | sed -En "--expression=$expression")
@@ -28,7 +28,7 @@ cd $BASEDIR
 ./gradlew build
 
 AAR=$RELEASE_DIR/$PROJECT-$VERSION.aar
-cp $BASEDIR/tmpfile/build/outputs/aar/$PROJECT-release.aar $AAR
+cp $BASEDIR/$PROJECT/build/outputs/aar/$PROJECT-release.aar $AAR
 
 cd $RELEASE_DIR
 

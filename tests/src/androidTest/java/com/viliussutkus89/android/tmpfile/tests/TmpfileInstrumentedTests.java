@@ -1,4 +1,4 @@
-package com.viliussutkus89.tmpfile.tests;
+package com.viliussutkus89.android.tmpfile.tests;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 

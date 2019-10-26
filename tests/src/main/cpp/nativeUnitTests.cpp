@@ -34,7 +34,7 @@ struct TmpFileAutoClose {
 extern "C" {
 
 JNIEXPORT jboolean JNICALL
-Java_com_viliussutkus89_tmpfile_tests_TmpfileInstrumentedTests_open_1and_1close_1tmpfile(JNIEnv*, jobject) {
+Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_open_1and_1close_1tmpfile(JNIEnv*, jobject) {
   TmpFileAutoClose openedFile;
 
   if (nullptr == openedFile.fh) {
@@ -51,7 +51,7 @@ Java_com_viliussutkus89_tmpfile_tests_TmpfileInstrumentedTests_open_1and_1close_
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_viliussutkus89_tmpfile_tests_TmpfileInstrumentedTests_write_1to_1tmpfile(JNIEnv*, jobject) {
+Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1to_1tmpfile(JNIEnv*, jobject) {
   TmpFileAutoClose openedFile;
 
   size_t written = 0;
@@ -95,7 +95,7 @@ size_t read_in_chunks(FILE * fh, char * buffer, size_t expectedLen) {
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_viliussutkus89_tmpfile_tests_TmpfileInstrumentedTests_write_1and_1readback_1from_1tmpfile(JNIEnv*, jobject) {
+Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1and_1readback_1from_1tmpfile(JNIEnv*, jobject) {
   TmpFileAutoClose openedFile;
   if (sampleData.length() != write_in_chunks(openedFile.fh, sampleData.cbegin(), sampleData.length())) {
     return JNI_FALSE;
@@ -121,7 +121,7 @@ Java_com_viliussutkus89_tmpfile_tests_TmpfileInstrumentedTests_write_1and_1readb
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_viliussutkus89_tmpfile_tests_TmpfileInstrumentedTests_write_1and_1readback_1lots_1of_1data(JNIEnv *, jobject, jint size) {
+Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1and_1readback_1lots_1of_1data(JNIEnv *, jobject, jint size) {
   TmpFileAutoClose openedFile;
 
   size_t length = (size_t) size;
@@ -158,7 +158,7 @@ Java_com_viliussutkus89_tmpfile_tests_TmpfileInstrumentedTests_write_1and_1readb
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_viliussutkus89_tmpfile_tests_TmpfileInstrumentedTests_open_1and_1not_1close_1tmpfile(JNIEnv*, jobject) {
+Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_open_1and_1not_1close_1tmpfile(JNIEnv*, jobject) {
   FILE * fh = tmpfile();
 
   if (nullptr == fh) {

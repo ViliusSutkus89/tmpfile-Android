@@ -25,7 +25,7 @@
  * https://medium.com/@andretietz/auto-initialize-your-android-library-2349daf06920
  */
 
-package com.viliussutkus89.tmpfile;
+package com.viliussutkus89.android.tmpfile;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;

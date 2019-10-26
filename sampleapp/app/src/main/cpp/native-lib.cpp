@@ -3,7 +3,7 @@
 #include <cassert>
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_viliussutkus89_tmpfile_sampleapp_MainActivity_call_1tmpfile(JNIEnv *, jobject) {
+Java_com_viliussutkus89_android_tmpfile_sampleapp_MainActivity_call_1tmpfile(JNIEnv *, jobject) {
   FILE *opened_file = tmpfile();
 
   assert(nullptr != opened_file);

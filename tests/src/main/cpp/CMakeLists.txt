@@ -10,5 +10,5 @@ STRING(TOLOWER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_lowercase)
 # Link against libtmpfile
 add_library(tmpfile SHARED IMPORTED)
 set_property(TARGET tmpfile PROPERTY IMPORTED_LOCATION
-  ${CMAKE_CURRENT_LIST_DIR}/../../../../tmpfile/build/intermediates/merged_native_libs/${CMAKE_BUILD_TYPE_lowercase}/out/lib/${ANDROID_ABI}/libtmpfile.so)
+  ${CMAKE_CURRENT_LIST_DIR}/../../../../lib/build/intermediates/merged_native_libs/${CMAKE_BUILD_TYPE_lowercase}/out/lib/${ANDROID_ABI}/libtmpfile.so)
 target_link_libraries(nativeUnitTests tmpfile)

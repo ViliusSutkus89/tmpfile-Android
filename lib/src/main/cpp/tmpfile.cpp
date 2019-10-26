@@ -34,7 +34,7 @@ static const char * TAG = "tmpfile";
 extern "C" {
 
 JNIEXPORT void JNICALL
-Java_com_viliussutkus89_tmpfile_Tmpfile_set_1tmpfile_1dir(JNIEnv *env, jclass, jstring tmpfile_dir) {
+Java_com_viliussutkus89_android_tmpfile_Tmpfile_set_1tmpfile_1dir(JNIEnv *env, jclass, jstring tmpfile_dir) {
   const char *tmpfile_dir_c = env->GetStringUTFChars(tmpfile_dir, nullptr);
   s_tmpfile_path_template = std::string(tmpfile_dir_c) + "/tmpfile-XXXXXX";
   s_path_is_set.store(true, std::memory_order_release);
