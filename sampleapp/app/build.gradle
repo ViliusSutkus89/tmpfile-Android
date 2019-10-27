@@ -16,19 +16,30 @@ android {
     ndkVersion "20.0.5594570"
 }
 
-// Extract shared .so libraries to build directory
-// So that they could be linked against in CMake
-task extractLibtmpfileSoForLinkingInCMake(type: Copy) {
-    from zipTree("${project.rootDir}/app/libs/tmpfile-1.0.0.aar")
-    into "${project.buildDir}/tmpfile/"
-    include "jni/**/libtmpfile.so"
-}
-preBuild.dependsOn extractLibtmpfileSoForLinkingInCMake
-
 dependencies {
-    implementation files('libs/tmpfile-1.0.1.aar')
+    implementation 'com.viliussutkus89:tmpfile-android:1.0.1'
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 }
+
+// Extract shared .so libraries to build directory
+// So that they could be linked against in CMake
+task extractLibtmpfileSoForLinkingInCMake(type: Copy) {
+    configurations {
+        extendedImplementation.extendsFrom implementation
+    }
+    // Cannot resolve "implementation" configuration directly
+    // Extend it, so it could be used to get resolved artifacts
+
+    configurations.extendedImplementation.getResolvedConfiguration().getResolvedArtifacts().each {
+        if (it.getName() == "tmpfile-android") {
+            from zipTree(it.getFile())
+            into "${project.buildDir}/tmpfile/"
+            include "jni/**/libtmpfile.so"
+        }
+    }
+}
+
+preBuild.dependsOn extractLibtmpfileSoForLinkingInCMake
 
