@@ -29,7 +29,7 @@ rm_folder_if_exists sampleapp/.gradle
 rm_folder_if_exists sampleapp/build
 rm_folder_if_exists sampleapp/app/.cxx
 rm_folder_if_exists sampleapp/app/build
-rm_file_if_exists sampleapp/app/libs/tmpfile-android-1.0.0.aar
+rm_file_if_exists sampleapp/app/libs/tmpfile-android-1.0.1.aar
 
 exit 0
 rm_folder_if_exists .idea

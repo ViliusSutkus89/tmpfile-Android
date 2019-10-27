@@ -58,15 +58,15 @@ Such a requirement is imposed by the current versions of Android Native Developm
 Library provides a proof of concept [sample application](/sampleapp).
 
 Loading tmpfile library is done in three (read: four) steps:
-* Downloading the library to app/libs/tmpfile-android-1.0.0.aar.
-* Including app/libs/tmpfile-android-1.0.0.aar as a dependency in Gradle. This step bundles Tmpfile.java and libtmpfile.so into your application's APK.
+* Downloading the library to app/libs/tmpfile-android-1.0.1.aar.
+* Including app/libs/tmpfile-android-1.0.1.aar as a dependency in Gradle. This step bundles Tmpfile.java and libtmpfile.so into your application's APK.
 * Linking your native (C / C++) binaries against *tmpfile* library (libtmpfile.so). This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
 
 #### Dependency in Gradle
 [sampleapp/app/build.gradle](sampleapp/app/build.gradle) contains code to load the library as a dependency in Gradle.
 ```gradle
 dependencies {
-    implementation files('libs/tmpfile-android-1.0.0.aar')
+    implementation files('libs/tmpfile-android-1.0.1.aar')
     ...
 }
 ```
@@ -80,7 +80,7 @@ As a workaround, sample application implements a Gradle task named *extractLibtm
 Task extractLibtmpfileSoForLinkingInCMake extracts native libraries (.so files) from tmpfile-Android-1.0.0.aar into application's build directory, so that they could be linked against in CMake.
 ```gradle
 task extractLibtmpfileSoForLinkingInCMake(type: Copy) {
-    from zipTree("${project.rootDir}/app/libs/tmpfile-android-1.0.0.aar")
+    from zipTree("${project.rootDir}/app/libs/tmpfile-android-1.0.1.aar")
     into "${project.buildDir}/tmpfile/"
     include "jni/**/libtmpfile.so"
 }
