@@ -79,7 +79,7 @@ bintray {
         version {
             name = this.version
             released = new Date()
-            vcsTag = this.version
+            vcsTag = "v${this.version}"
         }
     }
 }
