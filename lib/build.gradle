@@ -29,6 +29,13 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
 }
 
+task sourceJar(type: Jar) {
+    into ("", { from android.sourceSets.main.java.srcDirs} )
+    into ("cpp", { from fileTree(dir: "src/main/cpp/") } )
+    archiveBaseName = rootProject.name
+    archiveClassifier = 'sources'
+}
+
 bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
@@ -60,8 +67,9 @@ bintray {
 publishing {
     publications {
         projectRelease(MavenPublication) {
-            artifact "$buildDir/outputs/aar/${rootProject.name}-release.aar"
             artifactId rootProject.name
+            artifact "$buildDir/outputs/aar/${rootProject.name}-release.aar"
+            artifact sourceJar
             pom {
                 packaging = 'aar'
                 url = 'https://github.com/ViliusSutkus89/tmpfile-Android'
