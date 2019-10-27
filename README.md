@@ -1,5 +1,7 @@
 # tmpfile-Android
 
+[![Download](https://api.bintray.com/packages/viliussutkus89/maven-repo/tmpfile-android/images/download.svg)](https://bintray.com/viliussutkus89/maven-repo/tmpfile-android/_latestVersion)
+
 POSIX C library provides [`FILE *tmpfile(void)`](https://linux.die.net/man/3/tmpfile) function.
 > The **tmpfile()** function opens a unique temporary file in binary read/write (w+b) mode.  
 > The file will be automatically deleted when it is closed or the program terminates.  
@@ -57,37 +59,62 @@ Such a requirement is imposed by the current versions of Android Native Developm
 #### Example
 Library provides a proof of concept [sample application](/sampleapp).
 
-Loading tmpfile library is done in three (read: four) steps:
-* Downloading the library to app/libs/tmpfile-android-1.0.1.aar.
-* Including app/libs/tmpfile-android-1.0.1.aar as a dependency in Gradle. This step bundles Tmpfile.java and libtmpfile.so into your application's APK.
-* Linking your native (C / C++) binaries against *tmpfile* library (libtmpfile.so). This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
+Loading tmpfile library is done in two steps:
+* Including app/libs/tmpfile-android-1.0.1.aar as a dependency in Gradle.  
+This step bundles Tmpfile.java and libtmpfile.so into your application's APK.
+* Linking your native (C / C++) binaries against *tmpfile* library (libtmpfile.so).  
+This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
 
 #### Dependency in Gradle
 [sampleapp/app/build.gradle](sampleapp/app/build.gradle) contains code to load the library as a dependency in Gradle.
 ```gradle
 dependencies {
-    implementation files('libs/tmpfile-android-1.0.1.aar')
-    ...
+    implementation 'com.viliussutkus89:tmpfile-android:1.0.1'
+}
+```
+
+tmpfile-Android is served from Maven repository available at https://dl.bintray.com/viliussutkus89/maven-repo/ .
+It needs be added to [top level build.gradle](sampleapp/build.gradle)
+```gradle
+allprojects {
+    repositories {
+        ...
+        maven() {
+            url "https://dl.bintray.com/viliussutkus89/maven-repo/"
+        }
+    }
 }
 ```
 
 #### Linking native binaries against libtmpfile.so
 
-Sadly, native code (through CMake) is compiled and linked before Gradle extracts native libraries from dependencies.
-This makes linking against native libraries (.so files), delivered as Android libraries (.aar) through Gradle, somewhat problematic.
+It is not possible to link against objects inside .aar archives (as far as I know). libtmpfile.so needs to be extracted first.
 
 As a workaround, sample application implements a Gradle task named *extractLibtmpfileSoForLinkingInCMake*, which is executed before *preBuild* task.
 Task extractLibtmpfileSoForLinkingInCMake extracts native libraries (.so files) from tmpfile-Android-1.0.0.aar into application's build directory, so that they could be linked against in CMake.
 ```gradle
+// Extract shared .so libraries to build directory
+// So that they could be linked against in CMake
 task extractLibtmpfileSoForLinkingInCMake(type: Copy) {
-    from zipTree("${project.rootDir}/app/libs/tmpfile-android-1.0.1.aar")
-    into "${project.buildDir}/tmpfile/"
-    include "jni/**/libtmpfile.so"
+    configurations {
+        extendedImplementation.extendsFrom implementation
+    }
+    // Cannot resolve "implementation" configuration directly
+    // Extend it, so it could be used to get resolved artifacts
+
+    configurations.extendedImplementation.getResolvedConfiguration().getResolvedArtifacts().each {
+        if (it.getName() == "tmpfile-android") {
+            from zipTree(it.getFile())
+            into "${project.buildDir}/tmpfile/"
+            include "jni/**/libtmpfile.so"
+        }
+    }
 }
+
 preBuild.dependsOn extractLibtmpfileSoForLinkingInCMake
 ```
 
-Once libtmpfile.so is available, it can be used to link your binaries against it.
+Once libtmpfile.so is extracted, it can be used to link your binaries against it.
 
 Sample application uses [CMakeLists.txt](sampleapp/app/src/main/cpp/CMakeLists.txt) to build a native library called "native-lib".
 
