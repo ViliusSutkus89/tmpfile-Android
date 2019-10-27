@@ -73,14 +73,22 @@ dependencies {
 }
 ```
 
-tmpfile-Android is served from Maven repository available at https://dl.bintray.com/viliussutkus89/maven-repo/ .
+tmpfile-Android is served from JCenter Maven repository (available at https://jcenter.bintray.com).
 It needs be added to [top level build.gradle](sampleapp/build.gradle)
 ```gradle
 allprojects {
     repositories {
-        ...
+        jcenter()
+    }
+}
+```
+
+Older versions of Gradle (or Android Gradle plugin?) require JCenter url.
+```gradle
+allprojects {
+    repositories {
         maven() {
-            url "https://dl.bintray.com/viliussutkus89/maven-repo/"
+            url  "https://jcenter.bintray.com"
         }
     }
 }
