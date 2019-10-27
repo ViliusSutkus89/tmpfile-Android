@@ -25,6 +25,13 @@ android {
     ndkVersion "20.0.5594570"
 }
 
+configurations {
+    // * What went wrong:
+    // Could not determine the dependencies of task ':lib:javadoc'.
+    // > Resolving configuration 'implementation' directly is not allowed
+    extendedImplementation.extendsFrom implementation
+}
+
 dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
 }
@@ -34,6 +41,19 @@ task sourceJar(type: Jar) {
     into ("cpp", { from fileTree(dir: "src/main/cpp/") } )
     archiveBaseName = rootProject.name
     archiveClassifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    options.encoding = 'UTF-8'
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += configurations.extendedImplementation
+    title = "${rootProject.name} ${project.version} API"
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
 }
 
 bintray {
@@ -70,6 +90,7 @@ publishing {
             artifactId rootProject.name
             artifact "$buildDir/outputs/aar/${rootProject.name}-release.aar"
             artifact sourceJar
+            artifact javadocJar
             pom {
                 packaging = 'aar'
                 url = 'https://github.com/ViliusSutkus89/tmpfile-Android'
