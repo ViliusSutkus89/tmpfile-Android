@@ -5,3 +5,5 @@ android:
     - build-tools-29.0.2
     - android-29
 
+install: echo "y" | sdkmanager "ndk;20.0.5594570" > /dev/null
+
