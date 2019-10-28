@@ -1,5 +1,6 @@
 # tmpfile-Android
 
+[![Build Status](https://travis-ci.org/ViliusSutkus89/tmpfile-Android.svg?branch=master)](https://travis-ci.org/ViliusSutkus89/tmpfile-Android)
 [![Download](https://api.bintray.com/packages/viliussutkus89/maven-repo/tmpfile-android/images/download.svg)](https://bintray.com/viliussutkus89/maven-repo/tmpfile-android/_latestVersion)
 
 POSIX C library provides [`FILE *tmpfile(void)`](https://linux.die.net/man/3/tmpfile) function.
