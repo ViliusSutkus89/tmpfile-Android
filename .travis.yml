@@ -7,3 +7,5 @@ android:
 
 install: echo "y" | sdkmanager "ndk;20.0.5594570" > /dev/null
 
+script: ./gradlew assembleRelease
+
