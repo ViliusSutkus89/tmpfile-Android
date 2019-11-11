@@ -45,7 +45,6 @@ jobs:
             rm android-sdk.zip
           fi
           echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "tools" > /dev/null
-          ls -lhaR $ANDROID_HOME/tools
           sudo chmod +x $ANDROID_HOME/tools/bin/avdmanager
 
       - name: Prepare emulator
