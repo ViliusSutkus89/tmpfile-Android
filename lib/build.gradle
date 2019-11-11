@@ -25,13 +25,6 @@ android {
     ndkVersion "20.0.5594570"
 }
 
-configurations {
-    // * What went wrong:
-    // Could not determine the dependencies of task ':lib:javadoc'.
-    // > Resolving configuration 'implementation' directly is not allowed
-    extendedImplementation.extendsFrom implementation
-}
-
 dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
 }
@@ -47,7 +40,6 @@ task javadoc(type: Javadoc) {
     options.encoding = 'UTF-8'
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    classpath += configurations.extendedImplementation
     title = "${rootProject.name} ${project.version} API"
 }
 
