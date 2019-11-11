@@ -12,21 +12,21 @@ jobs:
       matrix:
         emulator-image:
           - "system-images;android-16;default;x86"
-          - "system-images;android-21;default;x86_64"
-          - "system-images;android-29;default;x86_64"
-          - "system-images;android-16;default;armeabi-v7a"
-          - "system-images;android-24;default;arm64-v8a"
+          #- "system-images;android-21;default;x86_64"
+          #- "system-images;android-29;default;x86_64"
+          #- "system-images;android-16;default;armeabi-v7a"
+          #- "system-images;android-24;default;arm64-v8a"
         include:
           - emulator-image: "system-images;android-16;default;x86"
             abi: x86
-          - emulator-image: "system-images;android-21;default;x86_64"
-            abi: x86_64
-          - emulator-image: "system-images;android-29;default;x86_64"
-            abi: x86_64
-          - emulator-image: "system-images;android-16;default;armeabi-v7a"
-            abi: armeabi-v7a
-          - emulator-image: "system-images;android-24;default;arm64-v8a"
-            abi: arm64-v8a
+          #- emulator-image: "system-images;android-21;default;x86_64"
+            #abi: x86_64
+          #- emulator-image: "system-images;android-29;default;x86_64"
+            #abi: x86_64
+          #- emulator-image: "system-images;android-16;default;armeabi-v7a"
+            #abi: armeabi-v7a
+          #- emulator-image: "system-images;android-24;default;arm64-v8a"
+            #abi: arm64-v8a
 
     steps:
       - uses: actions/checkout@v1
