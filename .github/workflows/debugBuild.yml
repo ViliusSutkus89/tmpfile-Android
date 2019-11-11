@@ -48,7 +48,7 @@ jobs:
 
       - name: Prepare emulator
         run: |
-          echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "emulator"
+          echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "emulator" > /dev/null
           echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager ${{ matrix.emulator-image }}
 
           echo "no" | android create avd --force --name avd-name --target ${{ matrix.emulator-image }} --abi ${{ matrix.abi }}
