@@ -8,6 +8,8 @@ android {
         targetSdkVersion 29
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk.abiFilters = project.hasProperty('abi') ? [ project.property('abi') ] : null
     }
     externalNativeBuild {
         cmake {

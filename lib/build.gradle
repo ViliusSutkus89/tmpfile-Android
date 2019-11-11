@@ -16,6 +16,7 @@ android {
         versionName project.version
 
         archivesBaseName = rootProject.name
+        ndk.abiFilters = project.hasProperty('abi') ? [ project.property('abi') ] : null
     }
     externalNativeBuild {
         cmake {
