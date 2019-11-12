@@ -2,32 +2,9 @@ name: Debug build
 
 on: push
 
-env:
-  ANDROID_SDK_TOOLS: "4333796"
-
 jobs:
   build:
     runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        emulator-image:
-          - "system-images;android-16;default;x86"
-          #- "system-images;android-21;default;x86_64"
-          #- "system-images;android-29;default;x86_64"
-          #- "system-images;android-16;default;armeabi-v7a"
-          #- "system-images;android-24;default;arm64-v8a"
-        include:
-          - emulator-image: "system-images;android-16;default;x86"
-            abi: x86
-          #- emulator-image: "system-images;android-21;default;x86_64"
-            #abi: x86_64
-          #- emulator-image: "system-images;android-29;default;x86_64"
-            #abi: x86_64
-          #- emulator-image: "system-images;android-16;default;armeabi-v7a"
-            #abi: armeabi-v7a
-          #- emulator-image: "system-images;android-24;default;arm64-v8a"
-            #abi: arm64-v8a
-
     steps:
       - uses: actions/checkout@v1
 
@@ -36,36 +13,6 @@ jobs:
         with:
           java-version: 1.8
 
-      - name: Install Android tools
-        run: |
-          if test ! -d $ANDROID_HOME/tools/bin/sdkmanager
-          then
-            wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
-            sudo unzip -d $ANDROID_HOME android-sdk.zip > /dev/null
-            rm android-sdk.zip
-          fi
-          echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "tools" > /dev/null
-          sudo chmod +x $ANDROID_HOME/tools/bin/avdmanager
-
-      - name: Prepare emulator
-        run: |
-          echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "emulator" > /dev/null
-          echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "${{ matrix.emulator-image }}" > /dev/null
-
-          echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name avd-name --package "${{ matrix.emulator-image }}" --abi ${{ matrix.abi }}
-          $ANDROID_HOME/emulator/emulator -avd avd-name -no-skin -no-audio no-window -no-snapshot &
-
       - name: Assemble Debug
         run: ./gradlew assembleDebug -PdisablePreDex -Pabi=${{ matrix.abi }}
-
-      - name: Wait for emulator
-        run: |
-          which adb
-          $ANDROID_HOME/platform-tools/adb wait-for-device
-          $ANDROID_HOME/platform-tools/adb shell 'while test "`getprop sys.boot_completed`" != "1"; do sleep 1; done'
-          $ANDROID_HOME/platform-tools/adb shell input keyevent 82
-          $ANDROID_HOME/platform-tools/adb devices
-
-      - name: Run tests on emulator
-        run: ./gradlew connectedCheck -PdisablePreDex -Pabi=${{ matrix.abi }}
 
