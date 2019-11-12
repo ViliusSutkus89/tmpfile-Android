@@ -16,17 +16,25 @@ android {
         versionName project.version
 
         archivesBaseName = rootProject.name
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
         }
     }
+    packagingOptions {
+        exclude 'lib/*/libnativeUnitTests.so'
+    }
     ndkVersion "20.1.5948944"
 }
 
 dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
+
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
 }
 
 task sourceJar(type: Jar) {
