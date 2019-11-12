@@ -24,6 +24,7 @@ jobs:
             rm android-sdk.zip
           fi
           echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "tools" > /dev/null
+          echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager --uninstall ndk-bundle > /dev/null
           echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager --licenses > /dev/null
 
       - name: Assemble Debug
