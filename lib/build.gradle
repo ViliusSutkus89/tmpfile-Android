@@ -22,7 +22,7 @@ android {
             path "src/main/cpp/CMakeLists.txt"
         }
     }
-    ndkVersion "20.0.5594570"
+    ndkVersion "20.1.5948944"
 }
 
 dependencies {
