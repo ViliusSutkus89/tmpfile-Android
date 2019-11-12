@@ -14,5 +14,5 @@ jobs:
           java-version: 1.8
 
       - name: Assemble Debug
-        run: ./gradlew assembleDebug -PdisablePreDex -Pabi=${{ matrix.abi }}
+        run: ./gradlew assembleDebug -PdisablePreDex
 
