@@ -27,6 +27,7 @@ jobs:
           echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "tools" > /dev/null
           echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager --uninstall ndk-bundle > /dev/null
           echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager --licenses > /dev/null
+          sudo chown --recursive $(whoami) $ANDROID_HOME
 
       - name: Assemble Release
         run: ./gradlew assembleRelease
