@@ -105,22 +105,16 @@ Task extractLibtmpfileSoForLinkingInCMake extracts native libraries (.so files) 
 ```gradle
 // Extract shared .so libraries to build directory
 // So that they could be linked against in CMake
-task extractLibtmpfileSoForLinkingInCMake(type: Copy) {
-    configurations {
-        extendedImplementation.extendsFrom implementation
+task extractLibtmpfileSoForLinkingInCMake {
+  doLast {
+    def tmpfileandroid = configurations.archives.find { it.name.startsWith("tmpfile-android") }
+    copy {
+      from zipTree(tmpfileandroid.getPath())
+      into "${project.buildDir}/tmpfile/"
+      include "jni/**/libtmpfile.so"
     }
-    // Cannot resolve "implementation" configuration directly
-    // Extend it, so it could be used to get resolved artifacts
-
-    configurations.extendedImplementation.getResolvedConfiguration().getResolvedArtifacts().each {
-        if (it.getName() == "tmpfile-android") {
-            from zipTree(it.getFile())
-            into "${project.buildDir}/tmpfile/"
-            include "jni/**/libtmpfile.so"
-        }
-    }
+  }
 }
-
 preBuild.dependsOn extractLibtmpfileSoForLinkingInCMake
 ```
 
