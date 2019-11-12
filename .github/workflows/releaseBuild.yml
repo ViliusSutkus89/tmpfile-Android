@@ -32,3 +32,54 @@ jobs:
       - name: Assemble Release
         run: ./gradlew assembleRelease
 
+      - name: Get version
+        id: get_version
+        run: echo "::set-output name=version::$(./getVersion.sh)"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: tmpfile-Android v${{ steps.get_version.outputs.version }}
+          draft: true
+          prerelease: false
+
+      - name: Upload aar
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./lib/build/outputs/aar/tmpfile-android-release.aar
+          asset_name: tmpfile-android-release.aar
+          asset_content_type: application/zip
+
+      - name: Generate javadoc
+        run: ./gradlew lib:javadocJar
+
+      - name: Upload javadoc.jar
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./lib/build/libs/tmpfile-android-${{steps.get_version.outputs.version}}-javadoc.jar
+          asset_name: tmpfile-android-${{steps.get_version.outputs.version}}-javadoc.jar
+          asset_content_type: application/zip
+
+      - name: Jar the sources
+        run: ./gradlew lib:sourceJar
+
+      - name: Upload sources.jar
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./lib/build/libs/tmpfile-android-${{steps.get_version.outputs.version}}-sources.jar
+          asset_name: tmpfile-android-${{steps.get_version.outputs.version}}-sources.jar
+          asset_content_type: application/zip
+

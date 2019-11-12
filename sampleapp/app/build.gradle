@@ -7,6 +7,8 @@ android {
         applicationId "com.viliussutkus89.tmpfile.sampleapp"
         minSdkVersion 16
         targetSdkVersion 29
+        versionCode 3
+        versionName '1.0.1'
     }
     externalNativeBuild {
         cmake {
