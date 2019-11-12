@@ -53,16 +53,18 @@ jobs:
           echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "${{ matrix.emulator-image }}" > /dev/null
 
           echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name avd-name --package "${{ matrix.emulator-image }}" --abi ${{ matrix.abi }}
-          $ANDROID_HOME/emulator/emulator -avd avd-name -no-skin -no-audio no-window &
+          $ANDROID_HOME/emulator/emulator -avd avd-name -no-skin -no-audio no-window -no-snapshot &
 
       - name: Assemble Debug
         run: ./gradlew assembleDebug -PdisablePreDex -Pabi=${{ matrix.abi }}
 
       - name: Wait for emulator
         run: |
-          ./android-wait-for-emulator
-          adb devices
-          adb shell input keyevent 82
+          which adb
+          $ANDROID_HOME/platform-tools/adb wait-for-device
+          $ANDROID_HOME/platform-tools/adb shell 'while test "`getprop sys.boot_completed`" != "1"; do sleep 1; done'
+          $ANDROID_HOME/platform-tools/adb shell input keyevent 82
+          $ANDROID_HOME/platform-tools/adb devices
 
       - name: Run tests on emulator
         run: ./gradlew connectedCheck -PdisablePreDex -Pabi=${{ matrix.abi }}
