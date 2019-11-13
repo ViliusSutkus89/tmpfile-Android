@@ -71,7 +71,7 @@ This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
 [sampleapp/app/build.gradle](sampleapp/app/build.gradle) contains code to load the library as a dependency in Gradle.
 ```gradle
 dependencies {
-    implementation 'com.viliussutkus89:tmpfile-android:1.0.1'
+    implementation 'com.viliussutkus89:tmpfile-android:1.0.2'
 }
 ```
 
