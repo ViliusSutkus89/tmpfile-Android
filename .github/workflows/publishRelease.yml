@@ -30,6 +30,7 @@ jobs:
 
   versionIncrementer:
     runs-on: ubuntu-18.04
+    needs: bintray
     steps:
       - uses: actions/checkout@v1
       - run: git checkout master
