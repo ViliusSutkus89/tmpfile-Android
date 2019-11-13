@@ -5,13 +5,13 @@ on:
     types: published
 
 jobs:
-  build:
+  bintray:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
 
       - name: Download assets from this Release
-        uses: ViliusSutkus89/release-asset-downloader@v1.0.2
+        uses: ViliusSutkus89/release-asset-downloader@v1.0.3
         with:
           outputDirectory: 'releaseAssets'
 
