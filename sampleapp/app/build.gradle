@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "29.0.3"
     defaultConfig {
         applicationId "com.viliussutkus89.tmpfile.sampleapp"
         minSdkVersion 16
@@ -15,7 +15,7 @@ android {
             path "src/main/cpp/CMakeLists.txt"
         }
     }
-    ndkVersion "20.1.5948944"
+    ndkVersion "21.2.6472646"
 }
 
 dependencies {
