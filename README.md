@@ -1,7 +1,6 @@
 # tmpfile-Android
 
-![Release build](https://github.com/ViliusSutkus89/tmpfile-Android/workflows/Release%20build/badge.svg)
-![Debug build](https://github.com/ViliusSutkus89/tmpfile-Android/workflows/Debug%20build/badge.svg)
+![Build](https://github.com/ViliusSutkus89/tmpfile-Android/workflows/build/badge.svg)
 [![Download](https://api.bintray.com/packages/viliussutkus89/maven-repo/tmpfile-android/images/download.svg)](https://bintray.com/viliussutkus89/maven-repo/tmpfile-android/_latestVersion)
 
 POSIX C library provides [`FILE *tmpfile(void)`](https://linux.die.net/man/3/tmpfile) function.
