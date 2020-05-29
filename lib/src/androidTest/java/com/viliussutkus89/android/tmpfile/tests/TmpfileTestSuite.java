@@ -12,6 +12,7 @@ import static com.viliussutkus89.android.tmpfile.Tmpfile.s_subfolderInCache;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
   TmpfileInstrumentedTests.class,
+  StandaloneEXEInstrumentedTests.class,
   NoLeftoverTmpfiles.class
 })
 public class TmpfileTestSuite {

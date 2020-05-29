@@ -3,7 +3,7 @@
  *
  * tmpfile function overload for broken implementations.
  *
- * Copyright (C) 2019 Vilius Sutkus'89
+ * Copyright (C) 2019,2020 Vilius Sutkus'89
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,12 +44,20 @@ Java_com_viliussutkus89_android_tmpfile_Tmpfile_set_1tmpfile_1dir(JNIEnv *env, j
 JNIEXPORT FILE *tmpfile() {
   FILE * handle = nullptr;
 
-  if (!s_path_is_set.load(std::memory_order_acquire)) {
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "tmpfile() called before tmpfile directory was set."
-                                                "Expect a failure if /data/local/tmp is unavailable.");
-  }
+  std::string path;
 
-  std::string path = s_tmpfile_path_template;
+  if (s_path_is_set.load(std::memory_order_acquire)) {
+    path = s_tmpfile_path_template;
+  } else {
+    const char * tmpDirFromEnv = getenv("TMPDIR");
+    if (NULL != tmpDirFromEnv) {
+      path = std::string(tmpDirFromEnv) + "/tmpfile-XXXXXX";
+    } else {
+      path = s_tmpfile_path_template;
+      __android_log_print(ANDROID_LOG_ERROR, TAG, "tmpfile() called before tmpfile directory was set."
+                                                  "Expect a failure if /data/local/tmp is unavailable.");
+    }
+  }
 
   int descriptor = mkstemp(&path[0]);
   if (-1 != descriptor) {

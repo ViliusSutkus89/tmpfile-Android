@@ -38,6 +38,8 @@ Proper storage location is per-application cache directory, obtained at runtime 
 [Tmpfile.java](/lib/src/main/java/com/viliussutkus89/android/tmpfile/Tmpfile.java) implements a [ContentProvider](https://developer.android.com/reference/android/content/ContentProvider)
 to automatically obtain application's cache directory on application start up.
 
+Standalone console programs (.exe's) don't care about ContentProviders. Tmpfile overload in standalone programs make use of TMPDIR environment value.
+
 Glibc's *tmpfile* creates temporary files and automatically deletes them whey they are closed or the program terminates.  
 This library:
 1) Uses [```mkstemp(char *template)```](https://linux.die.net/man/3/mkstemp) to create the temporary file,
