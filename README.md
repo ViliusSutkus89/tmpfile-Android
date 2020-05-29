@@ -102,7 +102,7 @@ allprojects {
 It is not possible to link against objects inside .aar archives (as far as I know). libtmpfile.so needs to be extracted first.
 
 As a workaround, sample application implements a Gradle task named *extractLibtmpfileSoForLinkingInCMake*, which is executed before *preBuild* task.
-Task extractLibtmpfileSoForLinkingInCMake extracts native libraries (.so files) from tmpfile-Android-1.0.0.aar into application's build directory, so that they could be linked against in CMake.
+Task extractLibtmpfileSoForLinkingInCMake extracts native libraries (.so files) from tmpfile-android-1.0.0.aar into application's build directory, so that they could be linked against in CMake.
 ```gradle
 // Extract shared .so libraries to build directory
 // So that they could be linked against in CMake

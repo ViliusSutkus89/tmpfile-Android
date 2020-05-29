@@ -79,6 +79,8 @@ expression="s/versionCode ([0-9]+)\$/versionCode $RELEASEDVERSIONCODE/"
 sed -E "--expression=$expression" -i $BASEDIR/sampleapp/app/build.gradle
 
 # Update library's version in example usage in README.md
-expression="s/implementation 'com.viliussutkus89:tmpfile-android:$version_format'/implementation 'com.viliussutkus89:tmpfile-android:$RELEASEDVERSION'/"
+expression="s/implementation 'com.viliussutkus89:tmpfile-android:${version_format}'/implementation 'com.viliussutkus89:tmpfile-android:$RELEASEDVERSION'/"
 sed -E "--expression=$expression" -i $BASEDIR/README.md
 
+expression="s/tmpfile-android-${version_format}.aar/tmpfile-android-$RELEASEDVERSION.aar/"
+sed -E "--expression=$expression" -i $BASEDIR/README.md
