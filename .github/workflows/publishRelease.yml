@@ -4,6 +4,11 @@ on:
   release:
     types: published
 
+env:
+  ANDROID_SDK_TOOLS:  "6514223"
+  ANDROID_NDK:        "21.2.6472646"
+  ANDROID_CMAKE:      "3.10.2.4988404"
+
 jobs:
   bintray:
     runs-on: ubuntu-18.04
