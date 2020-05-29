@@ -24,9 +24,6 @@ android {
             path "src/main/cpp/CMakeLists.txt"
         }
     }
-    packagingOptions {
-        exclude 'lib/*/libnativeUnitTests.so'
-    }
     ndkVersion "21.2.6472646"
 }
 
