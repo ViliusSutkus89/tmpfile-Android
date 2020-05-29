@@ -10,11 +10,7 @@ android {
         versionCode 4
         versionName '1.0.2'
     }
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-        }
-    }
+    externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
     ndkVersion "21.2.6472646"
 }
 
