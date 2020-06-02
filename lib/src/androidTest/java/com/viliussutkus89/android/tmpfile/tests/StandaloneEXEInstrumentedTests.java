@@ -9,7 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
@@ -24,7 +26,7 @@ public class StandaloneEXEInstrumentedTests {
   private static int CASE_write_and_readback_sixty_four_Megs = 5;
   private static int CASE_open_and_not_close_tmpfile = 6;
 
-  private boolean runEXE(Integer argument){
+  private boolean runEXE(Integer argument) {
     Context ctx = InstrumentationRegistry.getInstrumentation().getTargetContext();
     String nativeLibraryDir = ctx.getApplicationInfo().nativeLibraryDir;
 
@@ -37,6 +39,8 @@ public class StandaloneEXEInstrumentedTests {
     env.put("LD_LIBRARY_PATH", nativeLibraryDir);
     env.put("TMPDIR", TmpfileTestSuite.getTmpfileDir().getAbsolutePath());
 
+    pb.redirectErrorStream(true);
+
     Process p;
     try {
       p = pb.start();
@@ -45,12 +49,28 @@ public class StandaloneEXEInstrumentedTests {
       return false;
     }
 
-    while (true) {
+    Boolean retVal = null;
+    while (null == retVal) {
       try {
-        return 0 == p.waitFor();
+        retVal = (0 == p.waitFor());
       } catch (InterruptedException ignored) {
       }
     }
+
+    try {
+      File logFile = new File(ctx.getCacheDir(), "StandaloneEXEInstrumentedTests.log");
+      FileOutputStream os = new FileOutputStream(logFile);
+      InputStream is = p.getInputStream();
+      int bytesRead;
+      byte[] buff = new byte[16 * 1024];
+      while (-1 < (bytesRead = is.read(buff))) {
+        os.write(buff, 0, bytesRead);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return retVal;
   }
 
   @Test
