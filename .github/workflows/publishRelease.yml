@@ -67,6 +67,8 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: master
 
       - uses: actions/setup-java@v1
         with:
@@ -79,7 +81,7 @@ jobs:
           ./gradlew assembleDebug -PdisablePreDex
 
       - name: Upload app-debug.apk
-        uses: actions/upload-release-asset@v1.0.1
+        uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
