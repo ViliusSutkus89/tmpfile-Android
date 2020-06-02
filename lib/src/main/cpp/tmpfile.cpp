@@ -3,7 +3,7 @@
  *
  * tmpfile function overload for broken implementations.
  *
- * Copyright (C) 2019,2020 Vilius Sutkus'89
+ * Copyright (C) 2019, 2020 Vilius Sutkus'89
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,12 +24,9 @@
 #include <atomic>
 #include <string>
 #include <jni.h>
-#include <android/log.h>
 
 static std::string s_tmpfile_path_template("/data/local/tmp/tmpfile-XXXXXX");
 static std::atomic_bool s_path_is_set (false);
-
-static const char * TAG = "tmpfile";
 
 extern "C" {
 
@@ -46,17 +43,15 @@ JNIEXPORT FILE *tmpfile() {
 
   std::string path;
 
+  const char * tmpDirFromEnv;
+  bool defaultTemplateUsed = false;
   if (s_path_is_set.load(std::memory_order_acquire)) {
     path = s_tmpfile_path_template;
+  } else if (nullptr != (tmpDirFromEnv = getenv("TMPDIR"))) {
+    path = std::string(tmpDirFromEnv) + "/tmpfile-XXXXXX";
   } else {
-    const char * tmpDirFromEnv = getenv("TMPDIR");
-    if (NULL != tmpDirFromEnv) {
-      path = std::string(tmpDirFromEnv) + "/tmpfile-XXXXXX";
-    } else {
-      path = s_tmpfile_path_template;
-      __android_log_print(ANDROID_LOG_ERROR, TAG, "tmpfile() called before tmpfile directory was set."
-                                                  "Expect a failure if /data/local/tmp is unavailable.");
-    }
+    path = s_tmpfile_path_template;
+    defaultTemplateUsed = true;
   }
 
   int descriptor = mkstemp(&path[0]);
@@ -69,6 +64,10 @@ JNIEXPORT FILE *tmpfile() {
     // File already open,
     // can be unbound from the file system
     std::remove(path.c_str());
+  }
+
+  if (nullptr == handle && defaultTemplateUsed) {
+      printf("error: tmpfile() called before setting TMPDIR environment value.\n");
   }
   return handle;
 }
