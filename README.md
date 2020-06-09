@@ -63,7 +63,7 @@ Such a requirement is imposed by the current versions of Android Native Developm
 Library provides a proof of concept [sample application](/sampleapp).
 
 Loading tmpfile library is done in two steps:
-* Including app/libs/tmpfile-android-1.1.3.aar as a dependency in Gradle.  
+* Including app/libs/tmpfile-android-1.1.4.aar as a dependency in Gradle.  
 This step bundles Tmpfile.java and libtmpfile.so into your application's APK.
 * Linking your native (C / C++) binaries against *tmpfile* library (libtmpfile.so).  
 This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
@@ -72,7 +72,7 @@ This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
 [sampleapp/app/build.gradle](sampleapp/app/build.gradle) contains code to load the library as a dependency in Gradle.
 ```gradle
 dependencies {
-    implementation 'com.viliussutkus89:tmpfile-android:1.1.3'
+    implementation 'com.viliussutkus89:tmpfile-android:1.1.4'
 }
 ```
 
@@ -102,7 +102,7 @@ allprojects {
 It is not possible to link against objects inside .aar archives (as far as I know). libtmpfile.so needs to be extracted first.
 
 As a workaround, sample application implements a Gradle task named *extractLibtmpfileSoForLinkingInCMake*, which is executed before *preBuild* task.
-Task extractLibtmpfileSoForLinkingInCMake extracts native libraries (.so files) from tmpfile-android-1.1.3.aar into application's build directory, so that they could be linked against in CMake.
+Task extractLibtmpfileSoForLinkingInCMake extracts native libraries (.so files) from tmpfile-android-1.1.4.aar into application's build directory, so that they could be linked against in CMake.
 ```gradle
 // Extract shared .so libraries to build directory
 // So that they could be linked against in CMake
