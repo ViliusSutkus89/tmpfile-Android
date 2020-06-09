@@ -19,6 +19,12 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
     externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
     ndkVersion "21.2.6472646"
 }
