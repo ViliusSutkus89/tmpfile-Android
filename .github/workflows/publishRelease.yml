@@ -11,7 +11,7 @@ env:
 
 jobs:
   bintray:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
 
@@ -40,7 +40,7 @@ jobs:
         run: ./gradlew bintrayUpload -PbintrayUser=${{ secrets.BINTRAY_API_USER }} -PbintrayApiKey=${{ secrets.BINTRAY_API_KEY }}
 
   versionIncrementer:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: bintray
     steps:
       - uses: actions/checkout@v2
@@ -64,7 +64,7 @@ jobs:
 
   sampleApp:
     needs: versionIncrementer
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
