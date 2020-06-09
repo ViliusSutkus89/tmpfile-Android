@@ -18,12 +18,8 @@ android {
         archivesBaseName = rootProject.name
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-    buildTypes {
-        release {
-            minifyEnabled true
-            consumerProguardFiles 'proguard-rules.pro'
-        }
+
+        consumerProguardFiles 'proguard-rules.pro'
     }
     externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
     ndkVersion "21.2.6472646"
