@@ -20,6 +20,17 @@ jobs:
       - name: Build tmpfile-Android
         run: ./gradlew build -PdisablePreDex
 
+      - name: Publish to maven local
+        run: ./gradlew publishToMavenLocal
+
+      - name: Prepare sample app
+        run: .github/prepareSampleAppForUnpublishedLib.sh
+
+      - name: Build sample app from unpublished library
+        run: |
+          cd sampleapp
+          ./gradlew build
+
       - name: Get version
         id: get_version
         run: echo "::set-output name=version::$(./getVersion.sh)"
