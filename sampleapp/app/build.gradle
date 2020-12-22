@@ -11,7 +11,7 @@ android {
         versionName '1.1.4'
     }
     externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
-    ndkVersion "21.2.6472646"
+    ndkVersion "22.0.7026061"
 
     buildTypes {
         release {

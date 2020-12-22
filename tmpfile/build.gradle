@@ -22,7 +22,7 @@ android {
         consumerProguardFiles 'proguard-rules.pro'
     }
     externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
-    ndkVersion "21.2.6472646"
+    ndkVersion "22.0.7026061"
 }
 
 configurations {
