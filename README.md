@@ -48,7 +48,7 @@ This library:
 4) Returns the handle to be used by the caller.
 
 POSIX allows deleting open files.
-Deleted file is still available as long as you still have the handle.
+Deleted file is available as long as you still have the handle.
 It cannot be opened again and is not shown in it's parent directory.  
 Deleted file is actually deleted from disk and used space reclaimed when all the handles are closed.  
 Program termination, including crashing the program, closes the handles owned by the process.
@@ -59,8 +59,8 @@ Program termination, including crashing the program, closes the handles owned by
 This library requires Android API level 16 (Jelly Bean 4.1.x) or newer.
 Such a requirement is imposed by the current versions of Android Native Development Kit.
 
-This library also requires that your native libraries use a shared version of C++ STL.
-[sampleapp/app/build.gradle line 15](sampleapp/app/build.gradle#L15)
+This library also requires that your native library uses a shared version of C++ STL.
+Usage example available in [sampleapp/app/build.gradle line 15](sampleapp/app/build.gradle#L15)
 
 Using a different NDK version (22.0.7026061) may be problematic due to the fact that
 different NDK versions may not have backward compatible C++ STL shared libraries.
