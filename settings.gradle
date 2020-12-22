@@ -1,2 +1,2 @@
-include ':lib'
+include ':tmpfile'
 rootProject.name = 'tmpfile-android'

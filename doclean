@@ -19,17 +19,16 @@ function rm_file_if_exists() {
 
 rm_folder_if_exists .gradle
 rm_folder_if_exists build
-rm_folder_if_exists lib/.cxx
-rm_folder_if_exists lib/build
+rm_folder_if_exists tmpfile/.cxx
+rm_folder_if_exists tmpfile/build
 rm_folder_if_exists sampleapp/.gradle
 rm_folder_if_exists sampleapp/build
 rm_folder_if_exists sampleapp/app/.cxx
 rm_folder_if_exists sampleapp/app/build
 
-exit 0
 rm_folder_if_exists .idea
 rm_file_if_exists tmpfile-android.iml
-rm_file_if_exists lib/lib.iml
+rm_file_if_exists tmpfile/tmpfile.iml
 
 rm_folder_if_exists sampleapp/.idea
 rm_file_if_exists sampleapp/sampleapp.iml

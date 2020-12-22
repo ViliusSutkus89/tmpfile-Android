@@ -29,12 +29,12 @@ jobs:
       - name: Put release assets where gradle would have kept it after the build
         run: |
           ls -lha ./releaseAssets
-          mkdir --parents ./lib/build/outputs/aar
-          mv ./releaseAssets/tmpfile-android-release.aar ./lib/build/outputs/aar/
+          mkdir --parents ./tmpfile/build/outputs/aar
+          mv ./releaseAssets/tmpfile-android-release.aar ./tmpfile/build/outputs/aar/
 
-          mkdir --parents ./lib/build/libs
-          mv ./releaseAssets/tmpfile-android-*-javadoc.jar ./lib/build/libs/
-          mv ./releaseAssets/tmpfile-android-*-sources.jar ./lib/build/libs/
+          mkdir --parents ./tmpfile/build/libs
+          mv ./releaseAssets/tmpfile-android-*-javadoc.jar ./tmpfile/build/libs/
+          mv ./releaseAssets/tmpfile-android-*-sources.jar ./tmpfile/build/libs/
 
       - name: Upload to Bintray
         run: ./gradlew bintrayUpload -PbintrayUser=${{ secrets.BINTRAY_API_USER }} -PbintrayApiKey=${{ secrets.BINTRAY_API_KEY }}
