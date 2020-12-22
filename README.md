@@ -59,6 +59,12 @@ Program termination, including crashing the program, closes the handles owned by
 This library requires Android API level 16 (Jelly Bean 4.1.x) or newer.
 Such a requirement is imposed by the current versions of Android Native Development Kit.
 
+This library also requires that your native libraries use a shared version of C++ STL.
+[sampleapp/app/build.gradle line 15](sampleapp/app/build.gradle#L15)
+
+Using a different NDK version (22.0.7026061) may be problematic due to the fact that
+different NDK versions may not have backward compatible C++ STL shared libraries.
+
 #### Example
 Library provides a proof of concept [sample application](/sampleapp).
 

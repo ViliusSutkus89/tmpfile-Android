@@ -10,8 +10,9 @@ android {
         versionCode 10
         versionName '1.1.4'
     }
-    externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
     ndkVersion "22.0.7026061"
+    externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
+    defaultConfig.externalNativeBuild.cmake.arguments "-DANDROID_STL=c++_shared"
 
     buildTypes {
         release {
