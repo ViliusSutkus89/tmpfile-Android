@@ -1,0 +1,35 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild.cmake.arguments "-DANDROID_STL=c++_shared"
+    }
+    externalNativeBuild.cmake.path "src/androidTest/cpp/CMakeLists.txt"
+    ndkVersion "22.0.7026061"
+    buildFeatures.prefab true
+}
+
+tasks.whenTaskAdded {
+    switch (it.name) {
+    case "preDebugBuild":
+        it.dependsOn ":tmpfile:prefabDebugPackage"
+        break;
+    case "preReleaseBuild":
+        it.dependsOn ":tmpfile:prefabReleasePackage"
+        break;
+    }
+}
+
+dependencies {
+    implementation project(":tmpfile")
+
+    testImplementation 'junit:junit:4.13.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}
+

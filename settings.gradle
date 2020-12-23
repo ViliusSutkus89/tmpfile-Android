@@ -1,2 +1,2 @@
-include ':tmpfile'
+include ':tmpfile', ":tests"
 rootProject.name = 'tmpfile-android'
