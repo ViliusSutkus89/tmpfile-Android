@@ -12,6 +12,7 @@ import java.io.File;
 @RunWith(AndroidJUnit4.class)
 public class TmpfileInstrumentedTests {
   static {
+    System.loadLibrary("c++_shared");
     System.loadLibrary("nativeUnitTests");
   }
 

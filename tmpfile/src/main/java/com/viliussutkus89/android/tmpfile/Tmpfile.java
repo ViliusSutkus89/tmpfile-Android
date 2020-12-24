@@ -43,6 +43,7 @@ import java.io.File;
 public final class Tmpfile extends ContentProvider {
 
   static {
+    System.loadLibrary("c++_shared");
     System.loadLibrary("tmpfile");
   }
 
