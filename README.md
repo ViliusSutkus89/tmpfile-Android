@@ -35,7 +35,7 @@ Directory */data/local/tmp* is used as a hardcoded default location for the crea
 Proper storage location is per-application cache directory, obtained at runtime in Java using
 [`context.getCacheDir()`](https://developer.android.com/reference/android/content/Context.html#getCacheDir()).
     
-[Tmpfile.java](/lib/src/main/java/com/viliussutkus89/android/tmpfile/Tmpfile.java) implements a [ContentProvider](https://developer.android.com/reference/android/content/ContentProvider)
+[Tmpfile.java](tmpfile/src/main/java/com/viliussutkus89/android/tmpfile/Tmpfile.java) implements a [ContentProvider](https://developer.android.com/reference/android/content/ContentProvider)
 to automatically obtain application's cache directory on application start up.
 
 Standalone console programs (.exe's) don't care about ContentProviders. Tmpfile overload in standalone programs make use of TMPDIR environment value.
@@ -65,13 +65,25 @@ Usage example available in [sampleapp/app/build.gradle line 15](sampleapp/app/bu
 Using a different NDK version (22.0.7026061) may be problematic due to the fact that
 different NDK versions may not have backward compatible C++ STL shared libraries.
 
-#### Example
-Library provides a proof of concept [sample application](/sampleapp).
+tmpfile-Android is packaged as a [prefab library](https://developer.android.com/studio/build/native-dependencies),
+which means your application needs to enable prefab support in build.gradle 
+```groovy
+android {
+    buildFeatures {
+        prefab true
+    }
+}
+```
 
-Loading tmpfile library is done in two steps:
+Prefab requires Android Gradle Plugin 4 or newer.
+
+#### Example
+Library provides a proof of concept [sample application](sampleapp).
+
+Loading tmpfile-Android library is done in two steps:
 * Including app/libs/tmpfile-android-1.1.4.aar as a dependency in Gradle.  
 This step bundles Tmpfile.java and libtmpfile.so into your application's APK.
-* Linking your native (C / C++) binaries against *tmpfile* library (libtmpfile.so).  
+* Linking your native (C / C++) binaries against *tmpfile-Android* library (libtmpfile.so).
 This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
 
 #### Dependency in Gradle
@@ -87,62 +99,16 @@ It needs be added to [top level build.gradle](sampleapp/build.gradle)
 ```gradle
 allprojects {
     repositories {
+        ...
         jcenter()
-    }
-}
-```
-
-Older versions of Gradle (or Android Gradle plugin?) require JCenter url.
-```gradle
-allprojects {
-    repositories {
-        maven() {
-            url  "https://jcenter.bintray.com"
-        }
     }
 }
 ```
 
 #### Linking native binaries against libtmpfile.so
 
-It is not possible to link against objects inside .aar archives (as far as I know). libtmpfile.so needs to be extracted first.
-
-As a workaround, sample application implements a Gradle task named *extractLibtmpfileSoForLinkingInCMake*, which is executed before *preBuild* task.
-Task extractLibtmpfileSoForLinkingInCMake extracts native libraries (.so files) from tmpfile-android-1.1.4.aar into application's build directory, so that they could be linked against in CMake.
-```gradle
-// Extract shared .so libraries to build directory
-// So that they could be linked against in CMake
-task extractLibtmpfileSoForLinkingInCMake {
-    doLast {
-        def tmpfileandroid = configurations.releaseRuntimeClasspath.getResolvedConfiguration().getResolvedArtifacts().find {
-            it.name.startsWith("tmpfile-android")
-        }
-        copy {
-            from zipTree(tmpfileandroid.getFile())
-            into "${project.buildDir}/tmpfile/"
-            include "jni/**/libtmpfile.so"
-        }
-    }
-}
-
-preBuild.dependsOn extractLibtmpfileSoForLinkingInCMake
-```
-
-Once libtmpfile.so is extracted, it can be used to link your binaries against it.
-
-Sample application uses [CMakeLists.txt](sampleapp/app/src/main/cpp/CMakeLists.txt) to build a native library called "native-lib".
-
-To link against libtmpfile.so, it needs to be defined as an imported target (read: provided as a ready to use binary):
+tmpfile-Android is packaged as a prefab library, which means it can be found and linked against in [CMake](sampleapp/app/src/main/cpp/CMakeLists.txt):
 ```CMake
-add_library(tmpfile SHARED IMPORTED)
-set_property(TARGET tmpfile PROPERTY IMPORTED_LOCATION
-  # libtmpfile.so will be extracted in this directory by
-  # task extractLibtmpfileSoForLinkingInCMake in sampleapp/app/build.gradle
-  ${CMAKE_CURRENT_LIST_DIR}/../../../build/tmpfile/jni/${ANDROID_ABI}/libtmpfile.so
-)
-```
-
-Once a CMake target is available, it can be linked against.
-```CMake
-target_link_libraries(native-lib tmpfile)
+find_package(tmpfile REQUIRED CONFIG)
+target_link_libraries(YOUR_LIBRARY_NAME tmpfile::tmpfile)
 ```
