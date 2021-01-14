@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.viliussutkus89.android.tmpfile">
-    <application>
-        <provider
-            android:name=".Tmpfile"
-            android:label="Tmpfile initializer. Provides path to app cache directory for tmpfile() library call"
-            android:authorities="${applicationId}.tmpfile"
-            android:enabled="true"
-            android:initOrder="65535"
-            android:permission="false"
-            android:exported="false" />
-    </application>
+    <application />
 </manifest>
 
