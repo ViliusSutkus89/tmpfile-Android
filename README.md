@@ -2,6 +2,8 @@
 
 ![Build](https://github.com/ViliusSutkus89/tmpfile-Android/workflows/build/badge.svg)
 [![Download](https://api.bintray.com/packages/viliussutkus89/maven-repo/tmpfile-android/images/download.svg)](https://bintray.com/viliussutkus89/maven-repo/tmpfile-android/_latestVersion)
+[![Release](https://img.shields.io/github/tag/ViliusSutkus89/tmpfile-Android.svg?label=jitpack)](https://jitpack.io/#ViliusSutkus89/tmpfile-Android)
+
 
 POSIX C library provides [`FILE *tmpfile(void)`](https://linux.die.net/man/3/tmpfile) function.
 > The **tmpfile()** function opens a unique temporary file in binary read/write (w+b) mode.  

@@ -1,0 +1,3 @@
+before_install:
+  -  yes | sdkmanager "ndk;22.0.7026061"
+
