@@ -34,7 +34,8 @@ struct TmpFileAutoClose {
 extern "C" {
 
 JNIEXPORT jboolean JNICALL
-Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_open_1and_1close_1tmpfile(JNIEnv*, jobject) {
+Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_open_1and_1close_1tmpfile(
+    JNIEnv *, jobject) {
   TmpFileAutoClose openedFile;
 
   if (nullptr == openedFile.fh) {
@@ -43,7 +44,8 @@ Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_open_1and
   }
 
   if (!openedFile.close()) {
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "Failed to close previously opened tmpfile. errno: %d", errno);
+    __android_log_print(ANDROID_LOG_ERROR, TAG,
+                        "Failed to close previously opened tmpfile. errno: %d", errno);
     return JNI_FALSE;
   }
 
@@ -51,12 +53,14 @@ Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_open_1and
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1to_1tmpfile(JNIEnv*, jobject) {
+Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1to_1tmpfile(JNIEnv *,
+                                                                                          jobject) {
   TmpFileAutoClose openedFile;
 
   size_t written = 0;
   while (written < sampleData.length()) {
-    int writtenThisChunk = fwrite(&sampleData.at(written), sizeof(sampleData.at(0)), sampleData.length() - written, openedFile.fh);
+    int writtenThisChunk = fwrite(&sampleData.at(written), sizeof(sampleData.at(0)),
+                                  sampleData.length() - written, openedFile.fh);
     if (-1 == writtenThisChunk) {
       __android_log_print(ANDROID_LOG_ERROR, TAG, "fwrite failed!");
       return JNI_FALSE;
@@ -67,7 +71,7 @@ Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1to
   return JNI_TRUE;
 }
 
-size_t write_in_chunks(FILE * fh, const char * data, size_t length) {
+size_t write_in_chunks(FILE *fh, const char *data, size_t length) {
   size_t written = 0;
   while (written < length) {
     size_t writtenThisChunk = fwrite(&data[written], sizeof(char), length - written, fh);
@@ -80,7 +84,7 @@ size_t write_in_chunks(FILE * fh, const char * data, size_t length) {
   return written;
 }
 
-size_t read_in_chunks(FILE * fh, char * buffer, size_t expectedLen) {
+size_t read_in_chunks(FILE *fh, char *buffer, size_t expectedLen) {
   size_t haveRead = 0;
   while (haveRead < expectedLen) {
     size_t leftToRead = expectedLen - haveRead;
@@ -95,9 +99,11 @@ size_t read_in_chunks(FILE * fh, char * buffer, size_t expectedLen) {
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1and_1readback_1from_1tmpfile(JNIEnv*, jobject) {
+Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1and_1readback_1from_1tmpfile(
+    JNIEnv *, jobject) {
   TmpFileAutoClose openedFile;
-  if (sampleData.length() != write_in_chunks(openedFile.fh, sampleData.cbegin(), sampleData.length())) {
+  if (sampleData.length() !=
+      write_in_chunks(openedFile.fh, sampleData.cbegin(), sampleData.length())) {
     return JNI_FALSE;
   }
 
@@ -113,7 +119,8 @@ Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1an
   }
 
   if (0 != memcmp(sampleData.cbegin(), readBuffer.get(), sampleData.length())) {
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "Data read from tmpfile does not match previously written sample data!");
+    __android_log_print(ANDROID_LOG_ERROR, TAG,
+                        "Data read from tmpfile does not match previously written sample data!");
     return JNI_FALSE;
   }
 
@@ -121,7 +128,8 @@ Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1an
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1and_1readback_1lots_1of_1data(JNIEnv *, jobject, jint size) {
+Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1and_1readback_1lots_1of_1data(
+    JNIEnv *, jobject, jint size) {
   TmpFileAutoClose openedFile;
 
   size_t length = (size_t) size;
@@ -150,7 +158,8 @@ Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1an
   }
 
   if (0 != memcmp(randomData.get(), readBuffer.get(), length)) {
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "Data read from tmpfile does not match previously written sample data!");
+    __android_log_print(ANDROID_LOG_ERROR, TAG,
+                        "Data read from tmpfile does not match previously written sample data!");
     return JNI_FALSE;
   }
 
@@ -158,8 +167,9 @@ Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_write_1an
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_open_1and_1not_1close_1tmpfile(JNIEnv*, jobject) {
-  FILE * fh = tmpfile();
+Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_open_1and_1not_1close_1tmpfile(
+    JNIEnv *, jobject) {
+  FILE *fh = tmpfile();
 
   if (nullptr == fh) {
     __android_log_print(ANDROID_LOG_ERROR, TAG, "Failed to open tmpfile. errno: %d", errno);
