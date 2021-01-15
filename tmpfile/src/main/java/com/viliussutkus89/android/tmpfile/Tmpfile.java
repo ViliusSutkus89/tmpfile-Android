@@ -37,4 +37,6 @@ public final class Tmpfile {
   }
 
   private static native void set_cache_dir(String cache_dir);
+
+  public static native boolean self_test();
 }

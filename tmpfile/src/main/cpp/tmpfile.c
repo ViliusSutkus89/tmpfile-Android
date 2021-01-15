@@ -97,6 +97,16 @@ void native_set_cache_dir(JNIEnv *env, __attribute__((unused)) jclass clazz, jst
   free((void *) old_s_tmpfile_path_template);
 }
 
+
+jboolean native_self_test(__attribute__((unused)) JNIEnv *env, __attribute__((unused)) jclass clazz) {
+  FILE *test_file = tmpfile();
+  if (NULL != test_file) {
+    fclose(test_file);
+    return JNI_TRUE;
+  }
+  return JNI_FALSE;
+}
+
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, __attribute__((unused)) void *reserved) {
   s_is_jni = true;
   LOGD("tmpfile::JNI_OnLoad\n")
@@ -114,7 +124,8 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, __attribute__((unused)) void *reserved) {
   }
 
   const JNINativeMethod methods[] = {
-      {"set_cache_dir", "(Ljava/lang/String;)V", (void*)native_set_cache_dir}
+      {"set_cache_dir",        "(Ljava/lang/String;)V", (void *) native_set_cache_dir},
+      {"self_test",            "()Z",                   (void *) native_self_test}
   };
 
   int rc = (*env)->RegisterNatives(env, ClassTmpfile, methods, sizeof(methods)/sizeof(JNINativeMethod));
