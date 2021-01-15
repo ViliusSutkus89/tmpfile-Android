@@ -23,6 +23,7 @@ Lack of */tmp* results in failure of *tmpfile* function.
 Bionic's *tmpfile* interprets the word "may" as "may or may not" and does not print any error messages to *stdout* alerting the user that an error occurred.
 
 Numerous libraries rely on said function. None of them can be used on Android successfully.
+
 Porting such libraries would require either to:
 * Patch them to not use this particular function,
 * Implement an alternative *tmpfile* implementation.
@@ -32,15 +33,15 @@ Porting such libraries would require either to:
 This library provides an alternative *tmpfile* implementation.
 
 **Some** devices have */data/local/tmp/* available. Emphasis on the word some.  
-Directory */data/local/tmp* is used as a hardcoded default location for the creation of temporary files.
+Directory */data/local/tmp* is used as a hardcoded default when `tmpfile` is used without initialization.
 
-Proper storage location is per-application cache directory, obtained at runtime in Java using
+Proper storage location is within application's cache directory, which is obtained at runtime in Java using
 [`context.getCacheDir()`](https://developer.android.com/reference/android/content/Context.html#getCacheDir()).
-    
-[Tmpfile.java](tmpfile/src/main/java/com/viliussutkus89/android/tmpfile/Tmpfile.java) implements a [ContentProvider](https://developer.android.com/reference/android/content/ContentProvider)
-to automatically obtain application's cache directory on application start up.
 
-Standalone console programs (.exe's) don't care about ContentProviders. Tmpfile overload in standalone programs make use of TMPDIR environment value.
+tmpfile-Android needs to be initialized before usage. Initialization is done by calling static method `Tmpfile.init(getApplicationContext().getCacheDir());`.
+[Application class](/sampleapp/app/src/main/java/com/viliussutkus89/android/tmpfile/sampleapp/MyApplication.java) is an exemplar place to make the call.
+
+Standalone console programs (.exe's) don't call Java init code. `tmpfile()` overload in standalone programs make use of *TMPDIR* environment value.
 
 Glibc's *tmpfile* creates temporary files and automatically deletes them whey they are closed or the program terminates.  
 This library:
@@ -60,12 +61,6 @@ Program termination, including crashing the program, closes the handles owned by
 #### Requirements
 This library requires Android API level 16 (Jelly Bean 4.1.x) or newer.
 Such a requirement is imposed by the current versions of Android Native Development Kit.
-
-This library also requires that your native library uses a shared version of C++ STL.
-Usage example available in [sampleapp/app/build.gradle line 15](sampleapp/app/build.gradle#L15)
-
-Using a different NDK version (22.0.7026061) may be problematic due to the fact that
-different NDK versions may not have backward compatible C++ STL shared libraries.
 
 tmpfile-Android is packaged as a [prefab library](https://developer.android.com/studio/build/native-dependencies),
 which means your application needs to enable prefab support in build.gradle 
