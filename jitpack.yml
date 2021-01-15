@@ -1,5 +1,5 @@
 before_install:
+  -  env
   -  sdkmanager --list
-  -  sdkmanager --uninstall ndk ndk-bundle
-  -  yes | sdkmanager "ndk;22.0.7026061"
+  -  yes | sdkmanager ndk-bundle
 
