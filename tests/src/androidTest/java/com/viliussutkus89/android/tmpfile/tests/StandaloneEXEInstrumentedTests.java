@@ -19,12 +19,12 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class StandaloneEXEInstrumentedTests {
 
-  private static int CASE_open_and_close_tmpfile = 1;
-  private static int CASE_write_to_tmpfile = 2;
-  private static int CASE_write_and_readback_from_tmpfile = 3;
-  private static int CASE_write_and_readback_one_Meg = 4;
-  private static int CASE_write_and_readback_sixty_four_Megs = 5;
-  private static int CASE_open_and_not_close_tmpfile = 6;
+  private static final int CASE_open_and_close_tmpfile = 1;
+  private static final int CASE_write_to_tmpfile = 2;
+  private static final int CASE_write_and_readback_from_tmpfile = 3;
+  private static final int CASE_write_and_readback_one_Meg = 4;
+  private static final int CASE_write_and_readback_sixty_four_Megs = 5;
+  private static final int CASE_open_and_not_close_tmpfile = 6;
 
   private boolean runEXE(Integer argument) {
     Context ctx = InstrumentationRegistry.getInstrumentation().getTargetContext();
@@ -99,10 +99,7 @@ public class StandaloneEXEInstrumentedTests {
 
   @Test
   public void writeAndReadbackLotsOfData() {
-    int oneMeg = 1024 * 1024;
     assertTrue("Failed to write and readback one megabyte!", runEXE(CASE_write_and_readback_one_Meg));
-
-    int sixtyFourMegs = 64 * oneMeg;
     assertTrue("Failed to write and read back 64 megabytes!", runEXE(CASE_write_and_readback_sixty_four_Megs));
   }
 
