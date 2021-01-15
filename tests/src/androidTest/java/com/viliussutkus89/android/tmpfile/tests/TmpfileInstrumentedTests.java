@@ -31,6 +31,11 @@ public class TmpfileInstrumentedTests {
   }
 
   @Test
+  public void selfTest() {
+    assertTrue("Self test failed!", Tmpfile.self_test());
+  }
+
+  @Test
   public void openAndCloseTmpfile() {
     assertTrue("Failed to open and close tmpfile!", open_and_close_tmpfile());
   }

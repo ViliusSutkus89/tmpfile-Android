@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdatomic.h>
+#include <string.h>
 #include <jni.h>
 #include <android/log.h>
 #include "strcat_path_array.h"
@@ -102,12 +103,22 @@ jstring native_get_tmpfile_dir_path(JNIEnv *env, __attribute__((unused)) jclass 
 }
 
 jboolean native_self_test(__attribute__((unused)) JNIEnv *env, __attribute__((unused)) jclass clazz) {
+  const char *test_data = "Hello World!\n";
+  size_t len = strlen(test_data);
+  char read_back_buffer[len];
+
+  memset(read_back_buffer, '\0', len);
+
   FILE *test_file = tmpfile();
+
   if (NULL != test_file) {
+    fwrite(test_data, sizeof(char), len, test_file);
+    rewind(test_file);
+    fread(read_back_buffer, sizeof(char), len, test_file);
     fclose(test_file);
-    return JNI_TRUE;
   }
-  return JNI_FALSE;
+
+  return (0 == memcmp(test_data, read_back_buffer, len)) ? JNI_TRUE : JNI_FALSE;
 }
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, __attribute__((unused)) void *reserved) {
