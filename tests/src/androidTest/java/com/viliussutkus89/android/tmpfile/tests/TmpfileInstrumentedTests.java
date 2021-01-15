@@ -23,7 +23,7 @@ public class TmpfileInstrumentedTests {
 
   @Test
   public void tmpfileDirCreated() {
-    final File tmpfileDir = TmpfileTestSuite.getTmpfileDir();
+    final File tmpfileDir = Tmpfile.getTmpfileDir();
     assertTrue("Tmpfile directory does not exist!", tmpfileDir.exists());
     assertTrue("Tmpfile directory is not actually a directory!", tmpfileDir.isDirectory());
     assertTrue("Tmpfile directory is not readable!", tmpfileDir.canRead());

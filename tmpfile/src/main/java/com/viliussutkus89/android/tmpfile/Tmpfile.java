@@ -30,7 +30,6 @@ public final class Tmpfile {
     System.loadLibrary("tmpfile");
   }
 
-  public final static String s_subfolderInCache = "tmpfiles";
 
   public static void init(@NonNull Context ctx) {
     set_cache_dir(ctx.getCacheDir().getAbsolutePath());
