@@ -9,6 +9,6 @@ public class MyApplication extends Application {
   public void onCreate() {
     super.onCreate();
 
-    Tmpfile.init(getApplicationContext());
+    Tmpfile.init(getApplicationContext().getCacheDir());
   }
 }

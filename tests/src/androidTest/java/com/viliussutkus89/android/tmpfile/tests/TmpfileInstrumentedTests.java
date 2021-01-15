@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 public class TmpfileInstrumentedTests {
   @BeforeClass
   public static void setUpClass() {
-    Tmpfile.init(InstrumentationRegistry.getInstrumentation().getTargetContext());
+    Tmpfile.init(InstrumentationRegistry.getInstrumentation().getTargetContext().getCacheDir());
     System.loadLibrary("nativeUnitTests");
   }
 

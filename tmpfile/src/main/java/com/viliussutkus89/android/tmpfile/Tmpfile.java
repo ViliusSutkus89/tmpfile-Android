@@ -21,18 +21,16 @@
 
 package com.viliussutkus89.android.tmpfile;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
+import java.io.File;
 
 public final class Tmpfile {
   static {
     System.loadLibrary("tmpfile");
   }
 
-
-  public static void init(@NonNull Context ctx) {
-    set_cache_dir(ctx.getCacheDir().getAbsolutePath());
+  public static void init(@NonNull File cacheDir) {
+    set_cache_dir(cacheDir.getAbsolutePath());
   }
 
   private static native void set_cache_dir(String cache_dir);
