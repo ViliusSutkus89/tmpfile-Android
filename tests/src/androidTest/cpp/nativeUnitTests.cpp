@@ -169,4 +169,15 @@ Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests_open_1and
   return JNI_TRUE;
 }
 
+JNIEXPORT jint JNI_OnLoad(JavaVM *vm, __attribute__((unused)) void *unused) {
+  __android_log_print(ANDROID_LOG_DEBUG, TAG, "nativeUnitTests::JNI_OnLoad\n");
+
+  JNIEnv *env;
+  if (JNI_OK != vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6)) {
+    return JNI_ERR;
+  }
+
+  return JNI_VERSION_1_6;
+}
+
 }
