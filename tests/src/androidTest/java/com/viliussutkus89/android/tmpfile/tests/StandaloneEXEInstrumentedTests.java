@@ -35,7 +35,7 @@ public class StandaloneEXEInstrumentedTests {
       argument.toString()
     );
 
-    File tmpdir = TmpfileTestSuite.getTmpfileDir();
+    File tmpdir = new File(ctx.getCacheDir(), "tmpfiles");
     tmpdir.mkdirs();
 
     Map<String, String> env = pb.environment();
