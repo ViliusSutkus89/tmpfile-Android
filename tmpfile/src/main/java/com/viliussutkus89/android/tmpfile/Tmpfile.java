@@ -38,5 +38,11 @@ public final class Tmpfile {
 
   private static native void set_cache_dir(String cache_dir);
 
+  private static native String get_tmpfile_dir_path();
+
+  public static File getTmpfileDir() {
+    return new File(get_tmpfile_dir_path());
+  }
+
   public static native boolean self_test();
 }

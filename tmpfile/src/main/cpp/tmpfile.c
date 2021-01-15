@@ -97,6 +97,9 @@ void native_set_cache_dir(JNIEnv *env, __attribute__((unused)) jclass clazz, jst
   free((void *) old_s_tmpfile_path_template);
 }
 
+jstring native_get_tmpfile_dir_path(JNIEnv *env, __attribute__((unused)) jclass clazz) {
+  return (*env)->NewStringUTF(env, choose_tmpfile_directory());
+}
 
 jboolean native_self_test(__attribute__((unused)) JNIEnv *env, __attribute__((unused)) jclass clazz) {
   FILE *test_file = tmpfile();
@@ -125,6 +128,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, __attribute__((unused)) void *reserved) {
 
   const JNINativeMethod methods[] = {
       {"set_cache_dir",        "(Ljava/lang/String;)V", (void *) native_set_cache_dir},
+      {"get_tmpfile_dir_path", "()Ljava/lang/String;",  (void *) native_get_tmpfile_dir_path},
       {"self_test",            "()Z",                   (void *) native_self_test}
   };
 
