@@ -3,11 +3,17 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "Build configuration (Debug, Release, 
 
 project("tmpfile-Android-tests")
 
+set(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic")
+
+set(CMAKE_C_STANDARD 11)
+SET(CMAKE_C_FLAGS "-Wall -Wextra -pedantic")
+
 find_package(tmpfile REQUIRED CONFIG)
+find_library(log-lib log)
 
 add_library(nativeUnitTests SHARED nativeUnitTests.cpp)
 
-find_library(log-lib log)
 target_link_libraries(nativeUnitTests ${log-lib} tmpfile::tmpfile)
 
 add_executable(libTests.exe libTests.exe.cpp)
