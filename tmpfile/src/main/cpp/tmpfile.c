@@ -35,47 +35,57 @@
 const char *s_tmpfile_directory = NULL;
 atomic_bool s_tmpfile_directory_is_set = false;
 
-#define LOGE(...) if (atomic_load_explicit(&s_tmpfile_directory_is_set, memory_order_acquire)) { \
-  __android_log_print(ANDROID_LOG_ERROR, "tmpfile", __VA_ARGS__); \
+// tmpfile-Android provides a workaround for both Android (JNI) apps and standalone executables
+static bool s_is_jni = false;
+
+#define LOG(LOG_LEVEL, ...) if (s_is_jni) { \
+  __android_log_print(LOG_LEVEL, "tmpfile", __VA_ARGS__); \
 } else {                                                          \
     printf(__VA_ARGS__);                                          \
 }
 
-// directory containing tmpfile can be either (in this specific order):
+#define LOGE(...) LOG(ANDROID_LOG_ERROR, __VA_ARGS__)
+
+#ifdef NDEBUG
+#define LOGD(...) {}
+#else
+#define LOGD(...) LOG(ANDROID_LOG_DEBUG, __VA_ARGS__)
+#endif
+
+// tmpfile_directory can be either (in this specific order):
 // 1: set by JNI call to set_cache_dir
 // 2: obtained from environment variable TMPDIR
 // 3: /data/local/tmp
-static char *choose_tmpfile_template() {
+static const char *choose_tmpfile_directory() {
   const char *tmpfile_directory;
   if (atomic_load_explicit(&s_tmpfile_directory_is_set, memory_order_acquire)) {
     tmpfile_directory = s_tmpfile_directory;
-  } else if (NULL == (tmpfile_directory = getenv("TMPDIR")) || ('\0' == tmpfile_directory[0])) {
-    tmpfile_directory = c_default_directory;
+  } else {
+    if (s_is_jni) {
+      LOGE("Tmpfile is not initialized! Call Tmpfile::init() before trying to call POSIX tmpfile().\n")
+    }
+    tmpfile_directory = getenv("TMPDIR");
+    if (NULL == tmpfile_directory || '\0' == tmpfile_directory[0]) {
+      tmpfile_directory = c_default_directory;
+    }
   }
-
-  char *tmpfile_template = strcat_path_array((const char *[]) {
-      tmpfile_directory,
-      "/" c_filename_template,
-      NULL});
-  return tmpfile_template;
+  return tmpfile_directory;
 }
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-JNIEXPORT void JNICALL
-Java_com_viliussutkus89_android_tmpfile_Tmpfile_set_1cache_1dir(JNIEnv *env,
-                                                                __attribute__((unused)) jclass clazz,
-                                                                jstring cache_dir) {
+void native_set_cache_dir(JNIEnv *env, __attribute__((unused)) jclass clazz, jstring cache_dir) {
   const char *cache_dir_c = (*env)->GetStringUTFChars(env, cache_dir, JNI_FALSE);
+  LOGD("tmpfile::native_set_cache_dir('%s')\n", cache_dir_c)
+
   char *tmpfile_directory = strcat_path_array(
       (const char *[]) {cache_dir_c, "/" c_directory_in_cache, NULL});
   (*env)->ReleaseStringUTFChars(env, cache_dir, cache_dir_c);
 
   if (NULL == tmpfile_directory || !mkdirs_for_file(tmpfile_directory)) {
-    LOGE("Failed to create directory: '%s'\n", tmpfile_directory);
+    LOGE("Failed to create directory: '%s'\n", tmpfile_directory)
     free(tmpfile_directory);
     tmpfile_directory = NULL;
     return;
@@ -87,8 +97,38 @@ Java_com_viliussutkus89_android_tmpfile_Tmpfile_set_1cache_1dir(JNIEnv *env,
   free((void *) old_s_tmpfile_path_template);
 }
 
+JNIEXPORT jint JNI_OnLoad(JavaVM *vm, __attribute__((unused)) void *reserved) {
+  s_is_jni = true;
+  LOGD("tmpfile::JNI_OnLoad\n")
+
+  JNIEnv *env;
+  if (JNI_OK != (*vm)->GetEnv(vm, (void **) &env, JNI_VERSION_1_6)) {
+    LOGE("Failed to get JNI env!\n")
+    return JNI_ERR;
+  }
+
+  jclass ClassTmpfile = (*env)->FindClass(env, "com/viliussutkus89/android/tmpfile/Tmpfile");
+  if (NULL == ClassTmpfile) {
+    LOGE("Failed to get Tmpfile class!")
+    return JNI_ERR;
+  }
+
+  const JNINativeMethod methods[] = {
+      {"set_cache_dir", "(Ljava/lang/String;)V", (void*)native_set_cache_dir}
+  };
+
+  int rc = (*env)->RegisterNatives(env, ClassTmpfile, methods, sizeof(methods)/sizeof(JNINativeMethod));
+  if (JNI_OK != rc) {
+    LOGE("Failed to register native methods!\n")
+    return rc;
+  }
+
+  return JNI_VERSION_1_6;
+}
+
 JNIEXPORT FILE *tmpfile() {
-  char *tmpfile_path = choose_tmpfile_template();
+  char *tmpfile_path = strcat_path_array((const char *[]) { choose_tmpfile_directory(),
+                                                            "/" c_filename_template, NULL});
   if (NULL == tmpfile_path) {
     LOGE("tmpfile failure: failed to obtain path for tmpfiles!\n")
     return NULL;
