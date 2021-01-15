@@ -7,7 +7,6 @@ android {
         minSdkVersion 16
         targetSdkVersion 30
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        externalNativeBuild.cmake.arguments "-DANDROID_STL=c++_shared"
     }
     externalNativeBuild.cmake.path "src/androidTest/cpp/CMakeLists.txt"
     ndkVersion "22.0.7026061"

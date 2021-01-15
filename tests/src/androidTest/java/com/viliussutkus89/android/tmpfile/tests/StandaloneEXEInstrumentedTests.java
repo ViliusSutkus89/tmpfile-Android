@@ -35,9 +35,12 @@ public class StandaloneEXEInstrumentedTests {
       argument.toString()
     );
 
+    File tmpdir = TmpfileTestSuite.getTmpfileDir();
+    tmpdir.mkdirs();
+
     Map<String, String> env = pb.environment();
     env.put("LD_LIBRARY_PATH", nativeLibraryDir);
-    env.put("TMPDIR", TmpfileTestSuite.getTmpfileDir().getAbsolutePath());
+    env.put("TMPDIR", tmpdir.getAbsolutePath());
 
     pb.redirectErrorStream(true);
 

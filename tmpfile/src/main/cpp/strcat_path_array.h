@@ -1,9 +1,7 @@
 /*
- * Tmpfile.java
+ * strcat_path_array.h
  *
- * tmpfile function overload for broken implementations.
- *
- * Copyright (C) 2019 - 2021 Vilius Sutkus'89
+ * Copyright (C) 2021 Vilius Sutkus'89
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +15,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
-package com.viliussutkus89.android.tmpfile;
+#ifndef TMPFILE_ANDROID_STRCAT_PATH_ARRAY_H
+#define TMPFILE_ANDROID_STRCAT_PATH_ARRAY_H
 
-import android.content.Context;
+char *strcat_path_array(const char * input[]);
 
-import androidx.annotation.NonNull;
-
-public final class Tmpfile {
-  static {
-    System.loadLibrary("tmpfile");
-  }
-
-  public final static String s_subfolderInCache = "tmpfiles";
-
-  public static void init(@NonNull Context ctx) {
-    set_cache_dir(ctx.getCacheDir().getAbsolutePath());
-  }
-
-  private static native void set_cache_dir(String cache_dir);
-}
+#endif //TMPFILE_ANDROID_STRCAT_PATH_ARRAY_H

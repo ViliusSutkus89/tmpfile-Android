@@ -21,12 +21,8 @@ android {
     }
     ndkVersion "22.0.7026061"
     externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
-    defaultConfig.externalNativeBuild.cmake.arguments "-DANDROID_STL=c++_shared"
-
-    packagingOptions {
-        exclude("**libtmpfile.so")
-        exclude("**libc++_shared.so")
-    }
+    defaultConfig.externalNativeBuild.cmake.arguments "-DANDROID_STL=none"
+    packagingOptions.exclude("**libtmpfile.so")
 
     buildFeatures.prefabPublishing true
     prefab {

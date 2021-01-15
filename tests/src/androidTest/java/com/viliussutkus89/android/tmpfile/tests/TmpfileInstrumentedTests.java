@@ -18,8 +18,6 @@ public class TmpfileInstrumentedTests {
   @BeforeClass
   public static void setUpClass() {
     Tmpfile.init(InstrumentationRegistry.getInstrumentation().getTargetContext());
-
-    System.loadLibrary("c++_shared");
     System.loadLibrary("nativeUnitTests");
   }
 
