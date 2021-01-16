@@ -49,18 +49,10 @@ jobs:
 
       - run: ./doincrementversion
 
-      - name: git commit
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action - Version Incrementer"
-          git remote set-url origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
-
-          git add tmpfile/build.gradle README.md sampleapp/app/build.gradle
-
-          if git commit -m "PostRelease version increment"
-          then
-            git push
-          fi
+      - uses: ViliusSutkus89/git-auto-commit-action@v4
+        with:
+          commit_message: "Post release version increment"
+          file_pattern: tmpfile/build.gradle README.md sampleapp/app/build.gradle
 
   sampleApp:
     needs: versionIncrementer
@@ -89,3 +81,4 @@ jobs:
           asset_path: sampleapp/app/build/outputs/apk/debug/app-debug.apk
           asset_name: app-debug.apk
           asset_content_type: application/zip
+
