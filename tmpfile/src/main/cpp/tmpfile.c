@@ -27,7 +27,6 @@
 #include <jni.h>
 #include <android/log.h>
 #include "strcat_path_array.h"
-#include "mkdirs_for_file.h"
 
 #define c_directory_in_cache "tmpfiles"
 #define c_filename_template "tmpfile-XXXXXX"
@@ -80,17 +79,6 @@ extern "C" {
 void native_set_cache_dir(JNIEnv *env, __attribute__((unused)) jclass clazz, jstring cache_dir) {
   const char *cache_dir_c = (*env)->GetStringUTFChars(env, cache_dir, JNI_FALSE);
   LOGD("tmpfile::native_set_cache_dir('%s')\n", cache_dir_c)
-
-  char *tmpfile_directory = strcat_path_array(
-      (const char *[]) {cache_dir_c, "/" c_directory_in_cache, NULL});
-  (*env)->ReleaseStringUTFChars(env, cache_dir, cache_dir_c);
-
-  if (NULL == tmpfile_directory || !mkdirs_for_file(tmpfile_directory)) {
-    LOGE("Failed to create directory: '%s'\n", tmpfile_directory)
-    free(tmpfile_directory);
-    tmpfile_directory = NULL;
-    return;
-  }
 
   const char *old_s_tmpfile_path_template = s_tmpfile_directory;
   s_tmpfile_directory = tmpfile_directory;

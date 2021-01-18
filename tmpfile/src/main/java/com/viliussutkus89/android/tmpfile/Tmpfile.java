@@ -31,6 +31,7 @@ public final class Tmpfile {
 
   public static void init(@NonNull File cacheDir) {
     set_cache_dir(cacheDir.getAbsolutePath());
+    getTmpfileDir().mkdirs();
   }
 
   private static native void set_cache_dir(String cache_dir);

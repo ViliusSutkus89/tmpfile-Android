@@ -11,7 +11,6 @@ SET(CMAKE_C_FLAGS "-Wall -Wextra -pedantic")
 
 add_library(tmpfile SHARED
     tmpfile.c
-    mkdirs_for_file.h mkdirs_for_file.c
     strcat_path_array.h strcat_path_array.c
     )
 
