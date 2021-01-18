@@ -1,4 +1,4 @@
-version = '3.0.1'
+version = '3.0.2'
 group = 'com.viliussutkus89'
 
 apply plugin: 'com.android.library'
@@ -12,7 +12,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 30
 
-        versionCode 16
+        versionCode 17
         versionName project.version
 
         archivesBaseName = rootProject.name

@@ -77,7 +77,7 @@ Prefab requires Android Gradle Plugin 4 or newer.
 Library provides a proof of concept [sample application](sampleapp).
 
 Loading tmpfile-Android library is done in two steps:
-* Including app/libs/tmpfile-android-3.0.0.aar as a dependency in Gradle.  
+* Including app/libs/tmpfile-android-3.0.1.aar as a dependency in Gradle.  
 This step bundles Tmpfile.java and libtmpfile.so into your application's APK.
 * Linking your native (C / C++) binaries against *tmpfile-Android* library (libtmpfile.so).
 This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
@@ -86,7 +86,7 @@ This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
 [sampleapp/app/build.gradle](sampleapp/app/build.gradle) contains code to load the library as a dependency in Gradle.
 ```gradle
 dependencies {
-    implementation 'com.viliussutkus89:tmpfile-android:3.0.0'
+    implementation 'com.viliussutkus89:tmpfile-android:3.0.1'
 }
 ```
 
