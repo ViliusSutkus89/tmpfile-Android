@@ -81,7 +81,8 @@ void native_set_cache_dir(JNIEnv *env, __attribute__((unused)) jclass clazz, jst
   LOGD("tmpfile::native_set_cache_dir('%s')\n", cache_dir_c)
 
   const char *old_s_tmpfile_path_template = s_tmpfile_directory;
-  s_tmpfile_directory = tmpfile_directory;
+  s_tmpfile_directory = strcat_path_array((const char *[]) {cache_dir_c, "/" c_directory_in_cache, NULL});
+  (*env)->ReleaseStringUTFChars(env, cache_dir, cache_dir_c);
   atomic_store_explicit(&s_tmpfile_directory_is_set, true, memory_order_release);
   free((void *) old_s_tmpfile_path_template);
 }
