@@ -5,7 +5,6 @@ on:
     types: published
 
 env:
-  ANDROID_SDK_TOOLS:  "6514223"
   ANDROID_NDK:        "22.0.7026061"
   ANDROID_CMAKE:      "3.10.2.4988404"
 
@@ -19,7 +18,7 @@ jobs:
         with:
           java-version: 1.8
 
-      - run: .github/installAndroidTools.sh
+      - uses: ViliusSutkus/setup-android@release
 
       - name: Download assets from this Release
         uses: ViliusSutkus89/release-asset-downloader@v1.0
@@ -66,7 +65,8 @@ jobs:
         with:
           java-version: 1.8
 
-      - run: .github/installAndroidTools.sh
+      - uses: ViliusSutkus/setup-android@release
+      - run: sdkmanager "ndk;${{env.ANDROID_NDK}}" "cmake;${{env.ANDROID_CMAKE}}"
 
       - run: |
           cd sampleapp
