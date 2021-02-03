@@ -14,7 +14,7 @@ jobs:
         with:
           java-version: 1.8
 
-      - uses: ViliusSutkus/setup-android@release
+      - uses: ViliusSutkus89/setup-android@release
       - run: sdkmanager "ndk;${{env.ANDROID_NDK}}" "cmake;${{env.ANDROID_CMAKE}}"
 
       - name: Build tmpfile-Android
