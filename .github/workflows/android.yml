@@ -58,7 +58,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sample-app-debug.apk
+          name: sample-app
           path: sampleapp/app/build/outputs/apk/debug/app-debug.apk
 
       # Save output from Sonatype repo init
@@ -148,6 +148,12 @@ jobs:
           name: maven-local
           path: ~/.m2
 
+      #@TODO: build sample app again against publicly released library in Sonatype
+      #Blocked by TODO a few lines up
+      - uses: actions/download-artifact@v2
+        with:
+          name: sample-app
+
       - name: Get version
         id: get_version
         run: echo "::set-output name=version::$(./scripts/getVersion)"
@@ -164,7 +170,9 @@ jobs:
         with:
           tag_name: "v${{ steps.get_version.outputs.version }}"
           name: "${{ github.event.repository.name }} v${{ steps.get_version.outputs.version }}"
-          files: "${{ steps.get_home_dir.outputs.home }}/.m2/repository/**"
+          files: |
+            "${{ steps.get_home_dir.outputs.home }}/.m2/repository/**"
+            app-debug.apk
 
       - run: ./scripts/incrementVersion --patch
 
