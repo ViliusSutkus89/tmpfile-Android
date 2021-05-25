@@ -1,9 +1,8 @@
-version = '3.0.2'
 group = 'com.viliussutkus89'
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 android {
     compileSdkVersion 30
@@ -13,7 +12,7 @@ android {
         targetSdkVersion 30
 
         versionCode 17
-        versionName project.version
+        versionName rootProject.version
 
         archivesBaseName = rootProject.name
 
@@ -59,77 +58,67 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
-bintray {
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
 
-    publications = ['projectRelease']
+                artifactId rootProject.name
+                version = rootProject.version
 
-    pkg {
-        repo = 'maven-repo'
-        name = rootProject.name
-        desc = 'tmpfile function overload for broken implementations'
+                artifact sourceJar
+                artifact javadocJar
 
-        websiteUrl = 'https://github.com/ViliusSutkus89/tmpfile-Android'
-        vcsUrl = 'https://github.com/ViliusSutkus89/tmpfile-Android.git'
-        issueTrackerUrl = 'https://github.com/ViliusSutkus89/tmpfile-Android/issues'
-
-        licenses = ['GPL-3.0-only']
-        labels = ['tmpfile', 'android', 'workaround', 'posix', 'bionic']
-
-        publish = true
-
-        version {
-            name = this.version
-            released = new Date()
-            vcsTag = "v${this.version}"
+                pom {
+                    name = rootProject.name
+                    description = 'tmpfile function overload for broken implementations'
+                    url = 'https://github.com/ViliusSutkus89/tmpfile-Android'
+                    packaging = 'aar'
+                    inceptionYear = '2019'
+                    licenses {
+                        license {
+                            name = 'The GNU General Public License, Version 3'
+                            url = 'https://www.gnu.org/licenses/gpl-3.0.txt'
+                            distribution = 'repo'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = "ViliusSutkus89"
+                            name = "Vilius Sutkus"
+                            email = "ViliusSutkus89@gmail.com"
+                        }
+                    }
+                    scm {
+                        url = 'https://github.com/ViliusSutkus89/tmpfile-Android'
+                        connection = 'https://github.com/ViliusSutkus89/tmpfile-Android.git'
+                    }
+                }
+                pom.withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+                    // Iterate over the implementation dependencies (we don't want the test ones), adding a <dependency> node for each
+                    configurations.implementation.allDependencies.each {
+                        // Ensure dependencies such as fileTree are not included in the pom.
+                        if (it.name != 'unspecified') {
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', it.group)
+                            dependencyNode.appendNode('artifactId', it.name)
+                            dependencyNode.appendNode('version', it.version)
+                        }
+                    }
+                }
+            }
         }
     }
-}
 
-publishing {
-    publications {
-        projectRelease(MavenPublication) {
-            artifactId rootProject.name
-            artifact "$buildDir/outputs/aar/${rootProject.name}-release.aar"
-            artifact sourceJar
-            artifact javadocJar
-            pom {
-                packaging = 'aar'
-                url = 'https://github.com/ViliusSutkus89/tmpfile-Android'
-                inceptionYear = '2019'
-                licenses {
-                    license {
-                        name = 'The GNU General Public License, Version 3'
-                        url = 'https://www.gnu.org/licenses/gpl-3.0.txt'
-                        distribution = 'repo'
-                    }
-                }
-                developers {
-                    developer {
-                        id = "ViliusSutkus89"
-                        name = "Vilius Sutkus"
-                        email = "ViliusSutkus89@gmail.com"
-                    }
-                }
-                scm {
-                    url = 'https://github.com/ViliusSutkus89/tmpfile-Android'
-                    connection = 'https://github.com/ViliusSutkus89/tmpfile-Android.git'
-                }
-            }
-            pom.withXml {
-                def dependenciesNode = asNode().appendNode('dependencies')
-                // Iterate over the implementation dependencies (we don't want the test ones), adding a <dependency> node for each
-                configurations.implementation.allDependencies.each {
-                    // Ensure dependencies such as fileTree are not included in the pom.
-                    if (it.name != 'unspecified') {
-                        def dependencyNode = dependenciesNode.appendNode('dependency')
-                        dependencyNode.appendNode('groupId', it.group)
-                        dependencyNode.appendNode('artifactId', it.name)
-                        dependencyNode.appendNode('version', it.version)
-                    }
-                }
-            }
+    // This may look ugly...
+    // but useInMemoryPgpKeys expects valid keys even with required { false }
+    if (System.getenv('SIGNING_KEY')) {
+        signing {
+            required { true }
+            useInMemoryPgpKeys(System.getenv('SIGNING_KEY'), System.getenv('SIGNING_PASS'))
+            sign publishing.publications.release
         }
     }
 }

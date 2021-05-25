@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Cwd 'abs_path';
+use File::Basename;
+
+sub getBaseDir {
+    return dirname dirname Cwd::abs_path $0;
+}
+
+sub parseFile {
+    my $inputFile = shift;
+    my $searchExpression = shift;
+    open(FH, '<', $inputFile) or die $!;
+    while(<FH>) {
+        my @matches = $_ =~ $searchExpression;
+        if (@matches) {
+            close(FH);
+            return @matches;
+        }
+    }
+    die("Failed to parse file $inputFile");
+}
+
+my ($version) = parseFile(getBaseDir() . '/build.gradle', qr/^version = '(\d+\.\d+\.\d+)\'$/);
+print $version, "\n";

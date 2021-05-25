@@ -3,25 +3,36 @@
 buildscript {
     repositories {
         google()
-        jcenter()
-        
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.2'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-        
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
+plugins {
+    id('io.github.gradle-nexus.publish-plugin') version '1.1.0'
+}
+
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+version = '3.0.2'
+group = 'com.viliussutkus89'
+
+nexusPublishing {
+    repositories {
+        sonatype()
+    }
 }
