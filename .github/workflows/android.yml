@@ -174,9 +174,13 @@ jobs:
             "${{ steps.get_home_dir.outputs.home }}/.m2/repository/**"
             app-debug.apk
 
-      - run: ./scripts/incrementVersion --patch
+      - run: ./scripts/incrementVersion --release --patch
+
+      - name: Get incremented version
+        id: get_incremented_version
+        run: echo "::set-output name=version::$(./scripts/getVersion)"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Post release version increment"
-          file_pattern: build.gradle app/build.gradle
+          commit_message: "Post release version increment to ${{ steps.get_incremented_version.outputs.version }}"
+          file_pattern: build.gradle tmpfile/build.gradle README.md sampleapp/app/build.gradle
