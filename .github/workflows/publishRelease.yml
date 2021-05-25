@@ -11,6 +11,7 @@ env:
 jobs:
   bintray:
     runs-on: ubuntu-20.04
+    if: false
     steps:
       - uses: actions/checkout@v2
 
@@ -39,6 +40,7 @@ jobs:
         run: ./gradlew bintrayUpload -PbintrayUser=${{ secrets.BINTRAY_API_USER }} -PbintrayApiKey=${{ secrets.BINTRAY_API_KEY }}
 
   versionIncrementer:
+    if: false
     runs-on: ubuntu-20.04
     needs: bintray
     steps:
@@ -54,6 +56,7 @@ jobs:
           file_pattern: tmpfile/build.gradle README.md sampleapp/app/build.gradle
 
   sampleApp:
+    if: false
     needs: versionIncrementer
     runs-on: ubuntu-20.04
     steps:
