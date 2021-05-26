@@ -9,7 +9,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     externalNativeBuild.cmake.path "src/androidTest/cpp/CMakeLists.txt"
-    ndkVersion "22.0.7026061"
+    ndkVersion "22.1.7171670"
     buildFeatures.prefab true
 }
 
