@@ -1,7 +1,7 @@
 # tmpfile-Android
 
 ![Build](https://github.com/ViliusSutkus89/tmpfile-Android/actions/workflows/android.yml/badge.svg)
-[![Download](https://api.bintray.com/packages/viliussutkus89/maven-repo/tmpfile-android/images/download.svg)](https://bintray.com/viliussutkus89/maven-repo/tmpfile-android/_latestVersion)
+[![Download](https://maven-badges.herokuapp.com/maven-central/com.viliussutkus89/tmpfile-android/badge.svg)](https://search.maven.org/artifact/com.viliussutkus89/tmpfile-android)
 
 
 POSIX C library provides [`FILE *tmpfile(void)`](https://linux.die.net/man/3/tmpfile) function.
@@ -90,13 +90,13 @@ dependencies {
 }
 ```
 
-tmpfile-Android is distributed using [JCenter](https://jcenter.bintray.com) Maven repository.  
+tmpfile-Android is distributed using [Maven Central](https://search.maven.org/artifact/com.viliussutkus89/tmpfile-android) repository.
 It needs be added to [top level build.gradle](sampleapp/build.gradle)
 ```gradle
 allprojects {
     repositories {
         ...
-        jcenter()
+        mavenCentral()
     }
 }
 ```
