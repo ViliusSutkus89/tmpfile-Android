@@ -1,6 +1,6 @@
 # tmpfile-Android
 
-![Build](https://github.com/ViliusSutkus89/tmpfile-Android/workflows/build/badge.svg)
+![Build](https://github.com/ViliusSutkus89/tmpfile-Android/actions/workflows/android.yml/badge.svg)
 [![Download](https://api.bintray.com/packages/viliussutkus89/maven-repo/tmpfile-android/images/download.svg)](https://bintray.com/viliussutkus89/maven-repo/tmpfile-android/_latestVersion)
 
 
