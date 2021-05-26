@@ -2,8 +2,10 @@ name: android
 on:
   push:
     branches: [ master, main ]
+    paths-ignore: '**.md'
 #  pull_request:
 #    branches: [ '**' ]
+#   paths-ignore: '**.md'
 
 env:
   ANDROID_NDK:    "22.1.7171670"
@@ -171,6 +173,7 @@ jobs:
           tag_name: "v${{ steps.get_version.outputs.version }}"
           name: "${{ github.event.repository.name }} v${{ steps.get_version.outputs.version }}"
           files: |
+#            Test why this doesn't work
             "${{ steps.get_home_dir.outputs.home }}/.m2/repository/**"
             app-debug.apk
 
