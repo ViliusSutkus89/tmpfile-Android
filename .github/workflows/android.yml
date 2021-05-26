@@ -67,6 +67,7 @@ jobs:
       - name: 'Publish to Sonatype'
         if: github.event.ref == 'refs/heads/master' || github.event.ref == 'refs/heads/main'
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
+        shell: bash #pipefail needed for tee
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
