@@ -57,45 +57,30 @@ Program termination, including crashing the program, closes the handles owned by
 
 ## Usage
 
-#### Requirements
-This library requires Android API level 16 (Jelly Bean 4.1.x) or newer.
-Such a requirement is imposed by the current versions of Android Native Development Kit.
+A proof of concept [sample application](sampleapp) is provided.
 
-tmpfile-Android is packaged as a [prefab library](https://developer.android.com/studio/build/native-dependencies),
-which means your application needs to enable prefab support in build.gradle 
-```groovy
-android {
-    buildFeatures {
-        prefab true
-    }
-}
-```
+#### Requirements - Runtime
+Current versions of Android Native Development Kit requires Android API level 16 (Jelly Bean 4.1.x) or newer.
 
-Prefab requires Android Gradle Plugin 4 or newer.
-
-#### Example
-Library provides a proof of concept [sample application](sampleapp).
-
-Loading tmpfile-Android library is done in two steps:
-* Including app/libs/tmpfile-android-3.0.1.aar as a dependency in Gradle.  
-This step bundles Tmpfile.java and libtmpfile.so into your application's APK.
-* Linking your native (C / C++) binaries against *tmpfile-Android* library (libtmpfile.so).
-This step, in effect, redirects *tmpfile* function calls to libtmpfile.so
+#### Requirements - Compile-time
+For easier linking tmpfile-Android delivers a [Prefab package](https://developer.android.com/studio/build/native-dependencies).
+Prefab support requires Android Gradle Plugin 4 or newer.
 
 #### Dependency in Gradle
-[sampleapp/app/build.gradle](sampleapp/app/build.gradle) contains code to load the library as a dependency in Gradle.
+[project level build.gradle](sampleapp/app/build.gradle) contains code to load the library as a dependency in Gradle.
 ```gradle
 dependencies {
+    // ...
     implementation 'com.viliussutkus89:tmpfile-android:3.0.2'
 }
 ```
 
 tmpfile-Android is distributed using [Maven Central](https://search.maven.org/artifact/com.viliussutkus89/tmpfile-android) repository.
-It needs be added to [top level build.gradle](sampleapp/build.gradle)
+The repository needs to be added to the [top level build.gradle](sampleapp/build.gradle).
 ```gradle
 allprojects {
     repositories {
-        ...
+        // ...
         mavenCentral()
     }
 }
@@ -103,8 +88,18 @@ allprojects {
 
 #### Linking native binaries against libtmpfile.so
 
-tmpfile-Android is packaged as a prefab library, which means it can be found and linked against in [CMake](sampleapp/app/src/main/cpp/CMakeLists.txt):
+Library is linked against in [CMake](sampleapp/app/src/main/cpp/CMakeLists.txt):
 ```CMake
 find_package(tmpfile REQUIRED CONFIG)
 target_link_libraries(YOUR_LIBRARY_NAME tmpfile::tmpfile)
+```
+
+Previously mentioned `find_package(tmpfile REQUIRED CONFIG)` requires Prefab feature to be enabled in [project level build.gradle](sampleapp/app/build.gradle):
+```groovy
+android {
+    // ...
+    buildFeatures {
+        prefab true
+    }
+}
 ```
