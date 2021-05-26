@@ -173,7 +173,6 @@ jobs:
           tag_name: "v${{ steps.get_version.outputs.version }}"
           name: "${{ github.event.repository.name }} v${{ steps.get_version.outputs.version }}"
           files: |
-#            Test why this doesn't work
             "${{ steps.get_home_dir.outputs.home }}/.m2/repository/**"
             app-debug.apk
 
