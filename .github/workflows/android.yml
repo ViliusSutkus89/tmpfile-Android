@@ -27,8 +27,8 @@ jobs:
   build:
     environment: ${{ fromJSON('{"refs/heads/master":"BuildWithDeployToSonatype","refs/heads/main":"BuildWithDeployToSonatype"}')[github.event.ref] || 'BuildUnprivileged' }}
     outputs:
-      STAGING_REPO: ${{ steps.publishToSonatype.outputs.stagingRepo }}
-      STAGING_REPO_URI: ${{ steps.publishToSonatype.outputs.stagingRepoUri }}
+      STAGING_REPO: ${{ steps.sonatype.outputs.stagingRepo }}
+      STAGING_REPO_URI: ${{ steps.sonatype.outputs.stagingRepoUri }}
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -65,18 +65,19 @@ jobs:
 
       # Save output from Sonatype repo init
       - name: 'Publish to Sonatype'
-        id: publishToSonatype
         if: github.event.ref == 'refs/heads/master' || github.event.ref == 'refs/heads/main'
-        run: |
-          ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
-          # Created staging repository 'comviliussutkus89-1055' at https://oss.sonatype.org/service/local/repositories/comviliussutkus89-1055/content/
-          # .(.+). should be '(.+)', to match 'comviliussutkus89-1055', but we already far too deep in qoutes for a simple \' to work.
-          perl -ne 'print "::set-output name=stagingRepo::$2\n::set-output name=stagingRepoUri::$3\n::warning ::$1\n" if /^(Created staging repository .(.+). at (.+))$/' < publishToSonatype.log
+        run: ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
+
+      - name: 'Parse Sonatype repository'
+        id: sonatype
+        # Created staging repository 'comviliussutkus89-1055' at https://oss.sonatype.org/service/local/repositories/comviliussutkus89-1055/content/
+        # .(.+). should be '(.+)', to match 'comviliussutkus89-1055', but we already far too deep in qoutes for a simple \' to work.
+        run: perl -ne 'print "::set-output name=stagingRepo::$2\n::set-output name=stagingRepoUri::$3\n::warning ::$1\n" if /^(Created staging repository .(.+). at (.+))$/' < publishToSonatype.log
 
   staging:
     needs: build
