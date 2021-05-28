@@ -111,17 +111,7 @@ jobs:
           java-version: 8
       - uses: android-actions/setup-android@v2
 
-      - uses: actions/download-artifact@v2
-        with:
-          name: maven-local
-          path: ~/.m2
-
-      - run: |
-          mkdir build
-          echo ${{ needs.build.outputs.STAGING_REPO_URI }} > build/staging-repo-uri
-
-      #@TODO: test against previously built aar
-#      - run: scripts/prepareAarInstrumentedTests
+      - run: scripts/prepareAarInstrumentedTests tests --repository=${{ needs.build.outputs.STAGING_REPO_URI }}
 
       - uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -129,7 +119,7 @@ jobs:
           arch: ${{ matrix.arch }}
           target: ${{ matrix.target }}
           script: ./gradlew ":tests:connectedCheck"
-#          working-directory: build/aar-instrumented-tests
+          working-directory: build/aar-instrumented-tests
 
   production:
     if: github.event.ref == 'refs/heads/master' || github.event.ref == 'refs/heads/main'

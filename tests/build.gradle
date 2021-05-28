@@ -13,6 +13,7 @@ android {
     buildFeatures.prefab true
 }
 
+//#UNCOMMENT-WHEN-AAR-TESTING#/*
 tasks.whenTaskAdded {
     switch (it.name) {
     case "preDebugBuild":
@@ -23,10 +24,13 @@ tasks.whenTaskAdded {
         break;
     }
 }
+//#UNCOMMENT-WHEN-AAR-TESTING#*/
 
 dependencies {
+    //#UNCOMMENT-WHEN-AAR-TESTING#/*
     implementation project(":tmpfile")
-
+    //#UNCOMMENT-WHEN-AAR-TESTING#*/
+    //#UNCOMMENT-WHEN-AAR-TESTING#implementation 'com.viliussutkus89:tmpfile-android:#AAR-TESTING-VERSION#'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
