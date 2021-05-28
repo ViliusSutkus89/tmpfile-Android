@@ -113,6 +113,10 @@ jobs:
 
       - run: scripts/prepareAarInstrumentedTests tests --repository=${{ needs.build.outputs.STAGING_REPO_URI }}
 
+      - run: ./gradlew assembleRelease
+        with:
+          working-directory: build/aar-instrumented-tests
+
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
