@@ -52,7 +52,8 @@ my @inputs = (
     ["$projectName/src/androidTest/java",
         '$outputFile = dirname($outputFile) . "/${suffix}/" . basename($outputFile);',
         's/^package (.+);$/package $1\.$suffix;/'],
-    ["$projectName/src/androidTest/cpp"]
+    ["$projectName/src/androidTest/cpp", '',
+        's/Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests/Java_com_viliussutkus89_android_tmpfile_tests_${suffix}_TmpfileInstrumentedTests/']
 );
 
 # Path to generated project
