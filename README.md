@@ -1,6 +1,5 @@
 # tmpfile-Android
 
-![Build](https://github.com/ViliusSutkus89/tmpfile-Android/actions/workflows/android.yml/badge.svg)
 [![Download](https://maven-badges.herokuapp.com/maven-central/com.viliussutkus89/tmpfile-android/badge.svg)](https://search.maven.org/artifact/com.viliussutkus89/tmpfile-android)
 
 
