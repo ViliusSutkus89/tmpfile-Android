@@ -42,27 +42,6 @@ jobs:
 
       - run: ./gradlew assembleRelease
 
-      - run: ./gradlew publishToMavenLocal
-        env:
-          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-          SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: maven-local
-          path: ~/.m2
-
-      - name: Build sample app
-        run: |
-          ./scripts/prepareSampleAppForUnpublishedLib.sh
-          cd sampleapp
-          ./gradlew build
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: sample-app
-          path: sampleapp/app/build/outputs/apk/debug/app-debug.apk
-
       # Save output from Sonatype repo init
       - name: 'Publish to Sonatype'
         if: github.event.ref == 'refs/heads/master' || github.event.ref == 'refs/heads/main'
@@ -79,6 +58,27 @@ jobs:
         # Created staging repository 'comviliussutkus89-1055' at https://oss.sonatype.org/service/local/repositories/comviliussutkus89-1055/content/
         # .(.+). should be '(.+)', to match 'comviliussutkus89-1055', but we already far too deep in qoutes for a simple \' to work.
         run: perl -ne 'print "::set-output name=stagingRepo::$2\n::set-output name=stagingRepoUri::$3\n::warning ::$1\n" if /^(Created staging repository .(.+). at (.+))$/' < publishToSonatype.log
+
+      - run: ./scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=${{ steps.sonatype.outputs.stagingRepoUri }}
+
+      - name: Build sample app from staging library
+        run: ./gradlew build
+        working-directory: build/sampleapp-staging
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sampleapp-staging
+          path: build/sampleapp-staging/app/build/outputs/apk/debug/app-debug.apk
+
+      - run: ./gradlew publishToMavenLocal
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: maven-local
+          path: ~/.m2
 
   staging:
     needs: build
