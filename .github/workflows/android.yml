@@ -80,6 +80,9 @@ jobs:
           name: maven-local
           path: ~/.m2
 
+      # @TODO: add enhancement issue id for nexus plugin to skip this manual step
+      - run: echo "::warning ::Before pushing to Production you need to manually go to https://oss.sonatype.org/#stagingRepositories and release the staging repository named ${{ steps.sonatype.outputs.stagingRepo }}"
+
   staging:
     needs: build
     # Only macos VMs come with exposed CPU extensions to run hardware accelerated emulator
@@ -133,9 +136,6 @@ jobs:
       contents: write
     runs-on: ubuntu-20.04
     steps:
-      # @TODO: add enhancement issue id for nexus plugin to skip this manual step
-      - run: echo "::warning ::You need to manually go to https://oss.sonatype.org/#stagingRepositories and release a staging repository named ${{ needs.build.outputs.STAGING_REPO }}"
-
       - uses: actions/checkout@v2
         with:
           # A branch is required for post release version increment commit
@@ -144,6 +144,11 @@ jobs:
       - name: Get Released Version
         id: released_version
         run: echo "::set-output name=version::$(./scripts/getVersion)"
+
+      - name: Verify that the repository is already released
+        run: |
+          wget "https://oss.sonatype.org/content/groups/public/com/viliussutkus89/tmpfile-android/${{ steps.released_version.outputs.version }}/tmpfile-android-${{ steps.released_version.outputs.version }}.aar"
+          test -f tmpfile-android-${{ steps.released_version.outputs.version }}.aar
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
