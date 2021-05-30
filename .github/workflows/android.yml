@@ -121,7 +121,7 @@ jobs:
           api-level: ${{ matrix.api-level }}
           arch: ${{ matrix.arch }}
           target: ${{ matrix.target }}
-          script: ./gradlew ":tests:connectedCheck"
+          script: ./gradlew connectedCheck
           working-directory: build/aar-instrumented-tests
 
   production:
