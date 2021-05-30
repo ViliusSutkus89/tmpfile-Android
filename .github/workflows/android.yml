@@ -110,10 +110,11 @@ jobs:
           distribution: zulu
           java-version: 8
       - uses: android-actions/setup-android@v2
+      - run: sdkmanager "ndk;${{env.ANDROID_NDK}}" "cmake;${{env.ANDROID_CMAKE}}"
 
       - run: scripts/prepareAarInstrumentedTests tests --repository=${{ needs.build.outputs.STAGING_REPO_URI }}
 
-      - run: ./gradlew assembleRelease
+      - run: ./gradlew assemble
         working-directory: build/aar-instrumented-tests
 
       - uses: reactivecircus/android-emulator-runner@v2
