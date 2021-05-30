@@ -1,18 +1,15 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
-
 use Getopt::Long;
-use Cwd 'abs_path';
-use File::Basename;
-
-my $upMajor; my $upMinor; my $upPatch; my $isRelease;
-GetOptions(major => \$upMajor, minor => \$upMinor, patch => \$upPatch, release => \$isRelease);
-
+my $upMajor; my $upMinor; my $upPatch; my $isRelease; my $help;
+GetOptions(major => \$upMajor, minor => \$upMinor, patch => \$upPatch, release => \$isRelease, 'help' => \$help);
+if (defined $help) {
+    usage();
+}
 ###########################################################################################
 ### Config ### Config ### Config ### Config ### Config ### Config ### Config ### Config ###
 ###########################################################################################
-
 my @versionSourceFile = ('build.gradle', qr/^version = '(\d+\.\d+\.\d+)'$/);
 my @versionCodeSourceFile = ('tmpfile/build.gradle', qr/^\s+versionCode (\d+)$/);
 
@@ -50,16 +47,27 @@ sub versionIncrementer {
         $patch_++;
         $versionCode++;
     } else {
-        die("Incorrect usage! Call ${0} either with --major, --minor or a --patch argument!");
+        usage();
     }
     return ("${major}.${minor}.${patch_}", $versionCode);
+}
+
+sub usage {
+    die("Incorrect usage! Call ${0} either with --major, --minor or a --patch argument!");
+    print STDERR './', File::Basename::basename($0) , " --major|--minor|--patch [--release]\n";
+    print STDERR "\tMandatory: major, minor or patch to choose witch version to increment.\n";
+    print STDERR "\tOptional: release to updated README.md and other release files.\n";
+    exit 1;
 }
 ###########################################################################################
 ### ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ #
 ###########################################################################################
 
+use Cwd 'abs_path';
+use File::Basename 'dirname';
+my $baseDir = File::Basename::dirname File::Basename::dirname Cwd::abs_path $0;
 sub parseFile {
-    my $inputFile = (dirname dirname Cwd::abs_path $0) . '/' . shift;
+    my $inputFile = $baseDir . '/' . shift;
     my $searchExpression = shift;
 
     open(FH, '<', $inputFile) or die "$! : $inputFile";
@@ -77,11 +85,8 @@ my $oldVersion = parseFile(@versionSourceFile);
 my $oldVersionCode = parseFile(@versionCodeSourceFile);
 my ($newVersion, $newVersionCode) = versionIncrementer($oldVersion, $oldVersionCode);
 
-print "oldVersion:$oldVersion, oldVersionCode: $oldVersionCode\n";
-print "newVersion:$newVersion, newVersionCode: $newVersionCode\n";
-
 sub updateFile {
-    my $workFile = (dirname dirname Cwd::abs_path $0) . '/' . shift;
+    my $workFile = $baseDir . '/' . shift;
     my $origFile = $workFile . '.orig';
     my @updateExpressions = @_;
 
@@ -107,3 +112,19 @@ if (defined $isRelease) {
         updateFile(@$file);
     }
 }
+
+print "::set-output name=releasedVersion::$oldVersion\n";
+print "::set-output name=releasedVersionCode::$oldVersionCode\n";
+print "::set-output name=unreleasedVersion::$newVersion\n";
+print "::set-output name=unreleasedVersionCode::$newVersionCode\n";
+
+print "::set-output name=files::'";
+foreach my $file (@filesToUpdate) {
+    print shift(@$file), ' ';
+}
+if (defined $isRelease) {
+    foreach my $file (@filesToUpdateOnRelease) {
+        print shift(@$file), ' ';
+    }
+}
+print "'\n";

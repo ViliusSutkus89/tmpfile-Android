@@ -141,23 +141,20 @@ jobs:
           # A branch is required for post release version increment commit
           ref: ${{ github.event.ref }}
 
-      - name: Get Released Version
-        id: released_version
-        run: echo "::set-output name=version::$(./scripts/getVersion)"
+      - run: ./scripts/incrementVersion --release --patch
+        id: version
 
       - name: Verify that the repository is already released
         run: |
-          wget "https://oss.sonatype.org/content/groups/public/com/viliussutkus89/tmpfile-android/${{ steps.released_version.outputs.version }}/tmpfile-android-${{ steps.released_version.outputs.version }}.aar"
-          test -f tmpfile-android-${{ steps.released_version.outputs.version }}.aar
+          wget "https://oss.sonatype.org/content/groups/public/com/viliussutkus89/tmpfile-android/${{ steps.version.outputs.releasedVersion }}/tmpfile-android-${{ steps.version.outputs.releasedVersion }}.aar"
+          test -f tmpfile-android-${{ steps.version.outputs.releasedVersion }}.aar
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: "${{ github.event.repository.name }} v${{ steps.released_version.outputs.version }}"
-          tag: "v${{ steps.released_version.outputs.version }}"
-
-      - run: ./scripts/incrementVersion --release --patch
+          tag: "v${{ steps.version.outputs.releasedVersion }}"
+          name: "${{ github.event.repository.name }} v${{ steps.version.outputs.releasedVersion }}"
 
       - name: Build sample app from released library
         run: ./gradlew build
@@ -172,14 +169,10 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: "v${{ steps.released_version.outputs.version }}"
+          tag: "v${{ steps.version.outputs.releasedVersion }}"
           artifacts: "sampleapp/app/build/outputs/apk/debug/app-debug.apk,~/.m2/repository/**"
-
-      - name: Get Unreleased Version
-        id: unreleased_version
-        run: echo "::set-output name=version::$(./scripts/getVersion)"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Post release version increment from ${{ steps.released_version.outputs.version }} to ${{ steps.unreleased_version.outputs.version }}"
-          file_pattern: build.gradle tmpfile/build.gradle README.md sampleapp/app/build.gradle
+          commit_message: "Post release version increment from ${{ steps.version.outputs.releasedVersion }} to ${{ steps.version.outputs.unreleasedVersion }}"
+          file_pattern: ${{ steps.version.outputs.files }}
