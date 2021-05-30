@@ -102,7 +102,6 @@ sub parseVersion {
 
 sub getAbsolutePath {
     use Cwd qw/abs_path getcwd/;
-    use File::HomeDir;
 
     my $path = shift;
     my $doResolve = shift;
@@ -110,8 +109,7 @@ sub getAbsolutePath {
     # Implementation taken from
     # https://stackoverflow.com/questions/39275327/check-if-a-directory-exists-as-an-absolute-path/39275654#39275654
     if ($path =~ /^~/) {
-        my $home = File::HomeDir->my_home;
-        $path =~ s/^~/$home/;
+        $path =~ s/^~/$ENV{"HOME"}/;
     }
     if ($path !~ m#^/#) {
         $path = Cwd::getcwd . '/' . $path;
