@@ -132,52 +132,48 @@ jobs:
       contents: write
     runs-on: ubuntu-20.04
     steps:
+      # @TODO: add enhancement issue id for nexus plugin to skip this manual step
+      - run: echo "::warning ::You need to manually go to https://oss.sonatype.org/#stagingRepositories and release a staging repository named ${{ needs.build.outputs.STAGING_REPO }}"
+
       - uses: actions/checkout@v2
         with:
-          # post release version increment commit requires a branch
+          # A branch is required for post release version increment commit
           ref: ${{ github.event.ref }}
 
-      #@TODO: add enhancement issue id for nexus plugin to skip this manual step
-      - run: echo "::warning ::You need to manually go to https://oss.sonatype.org/#stagingRepositories and release a staging repository named ${{ needs.build.outputs.STAGING_REPO }}"
+      - name: Get Released Version
+        id: released_version
+        run: echo "::set-output name=version::$(./scripts/getVersion)"
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: "${{ github.event.repository.name }} v${{ steps.released_version.outputs.version }}"
+          tag: "v${{ steps.released_version.outputs.version }}"
+
+      - run: ./scripts/incrementVersion --release --patch
+
+      - name: Build sample app from released library
+        run: ./gradlew build
+        working-directory: sampleapp
 
       - uses: actions/download-artifact@v2
         with:
           name: maven-local
           path: ~/.m2
 
-      #@TODO: build sample app again against publicly released library in Sonatype
-      #Blocked by TODO a few lines up
-      - uses: actions/download-artifact@v2
+      - name: Attach files to GitHub Release
+        uses: ncipollo/release-action@v1
         with:
-          name: sample-app
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "v${{ steps.released_version.outputs.version }}"
+          artifacts: "sampleapp/app/build/outputs/apk/debug/app-debug.apk,~/.m2/repository/**"
 
-      - name: Get version
-        id: get_version
-        run: echo "::set-output name=version::$(./scripts/getVersion)"
-
-      # @TODO: add issue id
-      - name: Get HOME dir
-        id: get_home_dir
-        run: echo "::set-output name=home::$HOME"
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: "v${{ steps.get_version.outputs.version }}"
-          name: "${{ github.event.repository.name }} v${{ steps.get_version.outputs.version }}"
-          files: |
-            "${{ steps.get_home_dir.outputs.home }}/.m2/repository/**"
-            app-debug.apk
-
-      - run: ./scripts/incrementVersion --release --patch
-
-      - name: Get incremented version
-        id: get_incremented_version
+      - name: Get Unreleased Version
+        id: unreleased_version
         run: echo "::set-output name=version::$(./scripts/getVersion)"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Post release version increment to ${{ steps.get_incremented_version.outputs.version }}"
+          commit_message: "Post release version increment from ${{ steps.released_version.outputs.version }} to ${{ steps.unreleased_version.outputs.version }}"
           file_pattern: build.gradle tmpfile/build.gradle README.md sampleapp/app/build.gradle
