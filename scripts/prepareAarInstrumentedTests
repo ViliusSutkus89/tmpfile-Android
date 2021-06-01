@@ -1,15 +1,4 @@
 #!/usr/bin/env perl
-use warnings;
-use strict;
-use Cwd 'abs_path';
-use File::Basename;
-use File::Find;
-use File::Path 'make_path';
-my $baseDir = dirname dirname Cwd::abs_path $0;
-my $suffix = 'aartesting'; my $repository = 'mavenLocal'; my $projectName; my $version;
-chomp ($version = `"${baseDir}/scripts/getVersion"`);
-parseArguments();
-
 ###########################################################################################
 ### The Purpose ### The Purpose ### The Purpose ### The Purpose ### The Purpose ### The ###
 ###########################################################################################
@@ -21,115 +10,84 @@ parseArguments();
 ###########################################################################################
 ### ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The~ #
 ###########################################################################################
+use warnings;
+use strict;
 
-###########################################################################################
-### Config ### Config ### Config ### Config ### Config ### Config ### Config ### Config ###
-###########################################################################################
-# @inputs array contain inputs (files or directories) to use as sources.
-# Each entry is an array with the following elements:
-# 0: inputEntry (relative to base project directory),
-# [optional] 1: string to be evaluated to modify output filename,
-# [optional] 2..n: string to be evaluated to modify each line.
-#
-# Non-exhaustive, but safe list of available variables for the evaluation strings:
-# $projectName - supplied as a mandatory argument,
-# $suffix - supplied by --suffix argument, defaults to 'aartesting',
-# $repository - generated from --repository argument, contains either 'mavenLocal()' or 'maven { url 'https://www.example.org' }',
-# $version - output from getVersion script, '3.0.2' is valid content,
-# $inputFile - absolute path to the input file,
-# $outputFile - absolute path the output file, Java files may want to modify it.
-# $_ - current line during file modification.
-my @inputs = (
-    ['gradle'], ['gradlew'], ['gradle.properties'],
-    ['build.gradle', '', 's@//#AAR-TESTING-REPOSITORY#@$repository@'],
-    ['settings.gradle', '',
-        's/[\"\']\:tmpfile[\"\'], //',
-        's/^(rootProject\.name\s*=\s*[\"\'].+)([\"\'])$/${1}-aar-testing${2}/'],
-    ["$projectName/build.gradle", '',
-        's@//#UNCOMMENT-WHEN-AAR-TESTING#@@',
-        's@#AAR-TESTING-VERSION#@$version@'],
-    ["$projectName/src/main/AndroidManifest.xml", '', 's/(package=[\"\'].+)([\"\'])/$1\.${suffix}$2/'],
-    ["$projectName/src/androidTest/java",
-        '$outputFile = dirname($outputFile) . "/${suffix}/" . basename($outputFile);',
-        's/^package (.+);$/package $1\.$suffix;/'],
-    ["$projectName/src/androidTest/cpp", '',
-        's/Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests/Java_com_viliussutkus89_android_tmpfile_tests_${suffix}_TmpfileInstrumentedTests/']
-);
-
-# Path to generated project
-my $generatedDir = $baseDir . '/build/aar-instrumented-tests';
-###########################################################################################
-### ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ #
-###########################################################################################
+use File::Basename;
+use Getopt::Long;
+use lib File::Basename::dirname(__FILE__);
+use fileUpdater;
+use getVersion;
+use pathResolver;
+use repositoryInputParser;
 
 sub usage {
-    print STDERR './', basename($0) , " projectName [--repository=mavenLocal] [--suffix=aartesting]\n";
+    print STDERR './', File::Basename::basename(__FILE__), " projectName [--repository=mavenLocal] [--output=build/aar-instrumented-tests] [--suffix=aartesting]\n";
     print STDERR "\tMandatory: projectName is the project containing instrumented tests\n";
     print STDERR "\tOptional: repository can be either mavenLocal or https://www.example.org\n";
-    print STDERR "\tOptional: suffix is applied to processed java classes\n";
+    print STDERR "\tOptional: output is the path of generated output. Absolute or relative.\n";
+    print STDERR "\tOptional: suffix is applied to processed java classes, rootProject.name and package name in AndroidManifest.xml\n";
     exit 1;
 }
 
-sub parseArguments {
-    use Getopt::Long;
-    my $help;
-    GetOptions('suffix=s' => \$suffix, 'repository=s' => \$repository, 'help' => \$help);
-    if (defined $help) {
-        usage();
-    }
-    $projectName = shift @ARGV or do {
-        print STDERR "Missing mandatory argument projectName!\n";
-        usage();
-    };
-    if ($repository eq 'mavenLocal') {
-        $repository = 'mavenLocal()';
-    } elsif (index($repository, 'https://') == 0 || index($repository, 'http://') == 0) {
-        $repository = "maven { url '${repository}' }";
-    } else {
-        print STDERR "Malformed repository: ${repository}!\n";
-        usage();
-    }
+my $rootDirectory = getAbsolutePathOfBasedir(__FILE__, 2);
+my ($projectName, $help);
+my $repository = 'mavenLocal';
+my $outputDirectory = 'build/aar-instrumented-tests';
+my $suffix = 'aartesting';
+my $version = getVersion();
+Getopt::Long::GetOptions('repository=s' => \$repository, 'output=s' => \$outputDirectory, 'suffix=s' => \$suffix, 'help' => \$help);
+if (defined $help) {
+    usage();
 }
+$projectName = shift @ARGV or do {
+    print STDERR "Missing mandatory argument projectName!\n";
+    usage();
+};
+$repository = repositoryInputParser::parseRepository($repository) or usage();
 
-sub processFile {
-    my $inputFile = shift;
-    my $outputFile = $generatedDir . '/' . substr($inputFile, length($baseDir) + 1);
+my $aarStaging = fileUpdater->new({
+    rootDirectory   => $rootDirectory,
+    outputDirectory => $outputDirectory
+});
+$aarStaging->update([ 'gradle', 'gradlew', 'gradle.properties' ]);
+$aarStaging->update('build.gradle', sub {
+    $_ = shift;
+    s/\/\/#STAGING-REPOSITORY#/$repository/;
+    return $_;
+});
+$aarStaging->update('settings.gradle', sub {
+    $_ = shift;
+    s/["']\:tmpfile["'], //;
+    s/^(rootProject\.name\s*=\s*["'].+)(["'])$/${1}${suffix}${2}/;
+    return $_;
+});
 
-    # Evaluated expression needed to change output filename
-    eval shift if (@_);
+$aarStaging->update("$projectName/build.gradle", sub {
+    $_ = shift;
+    s@//#UNCOMMENT-WHEN-AAR-TESTING#@@;
+    s@#AAR-TESTING-VERSION#@$version@;
+    return $_;
+});
 
-    my @updateExpressions = @_;
+$aarStaging->update("$projectName/src/main/AndroidManifest.xml", sub {
+    $_ = shift;
+    s/(package=["'].+)(["'])/${1}.${suffix}${2}/;
+    return $_;
+});
 
-    open(my $FH_INPUT, '<', $inputFile) or die "$! : $inputFile\n";
-    make_path(dirname($outputFile), { chmod => 0755 } );
-    open(my $FH_OUTPUT, '>', $outputFile) or die "$! : $outputFile\n";
-    while(<$FH_INPUT>) {
-        foreach my $expr (@updateExpressions) {
-            eval $expr;
-        }
-        print $FH_OUTPUT $_;
-    }
+$aarStaging->update("$projectName/src/androidTest/java", sub {
+    $_ = shift;
+    s/^(package .+);$/${1}.${suffix};/;
+    return $_;
+}, sub {
+    $_ = shift;
+    $_ = dirname($_) . '/' . $suffix . '/' . basename($_);
+    return $_;
+});
 
-    my $mode = (stat($FH_INPUT))[2] & 07777;
-    close($FH_INPUT);
-    chmod($mode, $FH_OUTPUT);
-    close($FH_OUTPUT);
-}
-
-foreach my $item (@inputs) {
-    my $inputItem = $baseDir . '/' . (shift @$item);
-    -e $inputItem || die("Input '$inputItem does not exist!\n");
-
-    my $callback = sub {
-        if (-d $File::Find::name) {
-            return;
-        }
-        processFile($File::Find::name, @$item);
-    };
-
-    if (-d _) {
-        find($callback, $inputItem);
-    } else {
-        processFile($inputItem, @$item)
-    }
-}
+$aarStaging->update("$projectName/src/androidTest/cpp", sub {
+    $_ = shift;
+    s/Java_com_viliussutkus89_android_tmpfile_tests_TmpfileInstrumentedTests/Java_com_viliussutkus89_android_tmpfile_tests_${suffix}_TmpfileInstrumentedTests/;
+    return $_;
+});

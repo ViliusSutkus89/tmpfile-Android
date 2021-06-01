@@ -1,116 +1,88 @@
 #!/usr/bin/env perl
+###########################################################################################
+### The Purpose ### The Purpose ### The Purpose ### The Purpose ### The Purpose ### The ###
+###########################################################################################
+# The purpose of this script is to increment project version in various files.
+# This script may be triggered manually, or during a release.
+###########################################################################################
+### ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The~ #
+###########################################################################################
 use warnings;
 use strict;
+
+use File::Basename;
 use Getopt::Long;
-my $upMajor; my $upMinor; my $upPatch; my $isRelease; my $help;
-GetOptions(major => \$upMajor, minor => \$upMinor, patch => \$upPatch, release => \$isRelease, 'help' => \$help);
-if (defined $help) {
-    usage();
-}
-###########################################################################################
-### Config ### Config ### Config ### Config ### Config ### Config ### Config ### Config ###
-###########################################################################################
-my @versionSourceFile = ('build.gradle', qr/^version = '(\d+\.\d+\.\d+)'$/);
-my @versionCodeSourceFile = ('tmpfile/build.gradle', qr/^\s+versionCode (\d+)$/);
-
-# Variables available (Don't expand them here):
-# $oldVersion, $oldVersionCode - (released),
-# $newVersion, $newVersionCode - (unreleased, to be used for upcoming dev builds)
-my @filesToUpdate = (
-    ['build.gradle', 's/^(version\s*=\s*[\'"])$oldVersion([\'"])$/$1$newVersion$2/'],
-    ['tmpfile/build.gradle', 's/^(\s+versionCode\s+)$oldVersionCode$/$1$newVersionCode/']
-);
-
-# A released version number needs to be shown in README.md and sample app
-my @filesToUpdateOnRelease = (
-    ['README.md', 's/^(\s+implementation\s+[\'"]com.viliussutkus89\:tmpfile-android\:)[\d\.]+([\'"])$/$1$oldVersion$2/'],
-    ['sampleapp/app/build.gradle',
-        's/^(\s+versionName\s+[\'"])[\d\.]+([\'"])$/$1$oldVersion$2/',
-        's/^(\s+versionCode\s+)\d+$/$1$oldVersionCode/',
-        's/^(\s+implementation\s+[\'"]com\.viliussutkus89\:tmpfile-android\:)[\d\.]+([\'"])$/$1$oldVersion$2/'],
-);
-
-sub versionIncrementer {
-    my $versionString = shift;
-    my $versionCode = shift;
-    my ($major, $minor, $patch_) = $versionString =~ /(\d+)\.(\d+)\.(\d+)/;
-    if (defined $upMajor) {
-        $major++;
-        $minor = 0;
-        $patch_ = 0;
-        $versionCode += 100;
-    } elsif (defined $upMinor) {
-        $minor++;
-        $patch_ = 0;
-        $versionCode += 10;
-    } elsif (defined $upPatch) {
-        $patch_++;
-        $versionCode++;
-    } else {
-        usage();
-    }
-    return ("${major}.${minor}.${patch_}", $versionCode);
-}
+use lib File::Basename::dirname(__FILE__);
+use fileUpdater;
+use getVersion;
 
 sub usage {
-    die("Incorrect usage! Call ${0} either with --major, --minor or a --patch argument!");
-    print STDERR './', File::Basename::basename($0) , " --major|--minor|--patch [--release]\n";
+    print STDERR './', File::Basename::basename(__FILE__), " --major|--minor|--patch [--release]\n";
     print STDERR "\tMandatory: major, minor or patch to choose witch version to increment.\n";
     print STDERR "\tOptional: release to updated README.md and other release files.\n";
     exit 1;
 }
-###########################################################################################
-### ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ #
-###########################################################################################
 
-use Cwd 'abs_path';
-use File::Basename 'dirname';
-my $baseDir = File::Basename::dirname File::Basename::dirname Cwd::abs_path $0;
-sub parseFile {
-    my $inputFile = $baseDir . '/' . shift;
-    my $searchExpression = shift;
+# $oldVersion, $oldVersionCode - pre increment, possibly released
+# $newVersion, $newVersionCode - post increment, to be used for upcoming dev builds
+my $oldVersion = getVersion::getVersion();
+my $oldVersionCode = getVersion::getVersionCode();
+my ($newVersion, $newVersionCode);
 
-    open(FH, '<', $inputFile) or die "$! : $inputFile";
-    while(<FH>) {
-        my @matches = $_ =~ $searchExpression;
-        if (@matches) {
-            close(FH);
-            return $matches[0];
-        }
-    }
-    die("Failed to parse file $inputFile");
+my ($upMajor, $upMinor, $upPatch, $isRelease, $help);
+Getopt::Long::GetOptions(major => \$upMajor, minor => \$upMinor, patch => \$upPatch, release => \$isRelease, 'help' => \$help);
+if (defined $help) {
+    usage();
 }
 
-my $oldVersion = parseFile(@versionSourceFile);
-my $oldVersionCode = parseFile(@versionCodeSourceFile);
-my ($newVersion, $newVersionCode) = versionIncrementer($oldVersion, $oldVersionCode);
-
-sub updateFile {
-    my $workFile = $baseDir . '/' . shift;
-    my $origFile = $workFile . '.orig';
-    my @updateExpressions = @_;
-
-    open(FH_INPUT, '<', $workFile) or die "$! : $workFile";
-    rename($workFile, $origFile);
-    open(FH_OUTPUT, '>', $workFile) or die "$! : $workFile";
-    while(<FH_INPUT>) {
-        foreach my $expr (@updateExpressions) {
-            eval $expr;
-        }
-        print FH_OUTPUT $_;
-    }
-    close(FH_OUTPUT);
-    close(FH_INPUT);
-    unlink($origFile);
+my ($major, $minor, $patch_) = $oldVersion =~ /(\d+)\.(\d+)\.(\d+)/;
+if (defined $upMajor) {
+    $major++;
+    $newVersion = "${major}.0.0";
+    $newVersionCode = $oldVersionCode + 100;
+}
+elsif (defined $upMinor) {
+    $minor++;
+    $newVersion = "${major}.${minor}.0";
+    $newVersionCode = $oldVersionCode + 10;
+}
+elsif (defined $upPatch) {
+    $patch_++;
+    $newVersion = "${major}.${minor}.${patch_}";
+    $newVersionCode = $oldVersionCode + 1;
+}
+else {
+    usage();
 }
 
-foreach my $file (@filesToUpdate) {
-    updateFile(@$file);
-}
+my $rootDirectory = File::Basename::dirname(pathResolver::getAbsolutePath(File::Basename::dirname(__FILE__)));
+my $versionIncrementer = fileUpdater->new({ rootDirectory => $rootDirectory });
+
+$versionIncrementer->update('build.gradle', sub {
+    $_ = shift;
+    s/^(version\s*=\s*['"])${oldVersion}(['"])$/${1}${newVersion}$2/;
+    return $_;
+});
+
+$versionIncrementer->update('tmpfile/build.gradle', sub {
+    $_ = shift;
+    s/^(\s+versionCode\s+)${oldVersionCode}$/${1}${newVersionCode}/;
+    return $_;
+});
+
 if (defined $isRelease) {
-    foreach my $file (@filesToUpdateOnRelease) {
-        updateFile(@$file);
-    }
+    $versionIncrementer->update('README.md', sub {
+        $_ = shift;
+        s/^(\s+implementation\s+['"]com.viliussutkus89\:tmpfile-android\:)[\d\.]+(['"])$/${1}${oldVersion}${2}/;
+        return $_;
+    });
+    $versionIncrementer->update('sampleapp/app/build.gradle', sub {
+        $_ = shift;
+        s/^(\s+versionName\s+['"])[\d\.]+(['"])$/${1}${oldVersion}${2}/;
+        s/^(\s+versionCode\s+)\d+$/${1}${oldVersionCode}/;
+        s/^(\s+implementation\s+['"]com\.viliussutkus89\:tmpfile-android\:)[\d\.]+(['"])$/${1}${oldVersion}${2}/;
+        return $_;
+    });
 }
 
 print "::set-output name=releasedVersion::$oldVersion\n";
@@ -118,13 +90,8 @@ print "::set-output name=releasedVersionCode::$oldVersionCode\n";
 print "::set-output name=unreleasedVersion::$newVersion\n";
 print "::set-output name=unreleasedVersionCode::$newVersionCode\n";
 
-print "::set-output name=files::'";
-foreach my $file (@filesToUpdate) {
-    print shift(@$file), ' ';
-}
+print '::set-output name=files::\'build.gradle tmpfile/build.gradle';
 if (defined $isRelease) {
-    foreach my $file (@filesToUpdateOnRelease) {
-        print shift(@$file), ' ';
-    }
+    print ' README.md sampleapp/app/build.gradle';
 }
 print "'\n";

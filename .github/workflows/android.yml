@@ -115,7 +115,7 @@ jobs:
       - uses: android-actions/setup-android@v2
       - run: sdkmanager "ndk;${{env.ANDROID_NDK}}" "cmake;${{env.ANDROID_CMAKE}}"
 
-      - run: scripts/prepareAarInstrumentedTests tests --repository=${{ needs.build.outputs.STAGING_REPO_URI }}
+      - run: scripts/prepareAarInstrumentedTests tests --repository=${{ needs.build.outputs.STAGING_REPO_URI }} --output=build/aar-instrumented-tests
 
       - run: ./gradlew assemble
         working-directory: build/aar-instrumented-tests

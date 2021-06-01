@@ -21,7 +21,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        //#AAR-TESTING-REPOSITORY#
+        //#STAGING-REPOSITORY#
     }
 }
 

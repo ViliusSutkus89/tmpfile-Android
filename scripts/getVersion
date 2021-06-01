@@ -1,26 +1,41 @@
 #!/usr/bin/env perl
-use warnings;
+# getVersion.pm is symlinked to getVersion
+# This is needed to make this script both a module and a script.
+package getVersion;
 use strict;
-use Cwd 'abs_path';
-use File::Basename;
+use warnings;
 
-sub getBaseDir {
-    return dirname dirname Cwd::abs_path $0;
+use base 'Exporter';
+our $VERSION = '1.00';
+our @EXPORT = qw(getVersion);
+our @EXPORT_OK = qw(getVersionCode);
+
+use File::Basename 'dirname';
+use lib dirname(__FILE__);
+use fileParser 'grepSingleLine';
+use pathResolver 'getAbsolutePath';
+
+my $scriptsDir = pathResolver::getAbsolutePath(File::Basename::dirname(__FILE__));
+my $rootDir = File::Basename::dirname($scriptsDir);
+
+sub getVersion {
+    my ($version) = fileParser::grepSingleLine(
+        pathResolver::getAbsolutePath($rootDir . '/build.gradle'),
+        qr/^version\s*=\s*["'](\d+\.\d+\.\d+)["']$/
+    );
+    return $version;
 }
 
-sub parseFile {
-    my $inputFile = shift;
-    my $searchExpression = shift;
-    open(FH, '<', $inputFile) or die $!;
-    while(<FH>) {
-        my @matches = $_ =~ $searchExpression;
-        if (@matches) {
-            close(FH);
-            return @matches;
-        }
-    }
-    die("Failed to parse file $inputFile");
+sub getVersionCode {
+    my ($versionCode) = fileParser::grepSingleLine(
+        pathResolver::getAbsolutePath($rootDir . '/tmpfile/build.gradle'),
+        qr/versionCode\s+(\d+)\s*$/
+    );
+    return $versionCode;
 }
 
-my ($version) = parseFile(getBaseDir() . '/build.gradle', qr/^version = '(\d+\.\d+\.\d+)\'$/);
-print $version, "\n";
+if (not caller()) {
+    print getVersion(), "\n";
+}
+
+1;

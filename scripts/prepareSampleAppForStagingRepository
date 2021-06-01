@@ -1,173 +1,81 @@
 #!/usr/bin/env perl
-use warnings;
-use strict;
-use File::Basename 'dirname';
-
-my $rootDirectory; my $appProjectName;
-my $repository = 'mavenLocal'; my $outputDirectory = 'build/staging-app';
-my $version;
-parseVersion();
-parseArguments();
-
 ###########################################################################################
 ### The Purpose ### The Purpose ### The Purpose ### The Purpose ### The Purpose ### The ###
 ###########################################################################################
 # The purpose of this script is to build an application against a library in staging state.
 # This is needed to verify that the library either in mavenLocal or a remote staging
 # repository can be used to build the application.
+# Version of the sample application is set to library version with a s '-STAGING' suffix.
 ###########################################################################################
 ### ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The Purpose~ # ~The~ #
 ###########################################################################################
+use warnings;
+use strict;
 
-###########################################################################################
-### Config ### Config ### Config ### Config ### Config ### Config ### Config ### Config ###
-###########################################################################################
-# @inputs array contain inputs (files or directories) to use as sources.
-# Each entry is an array with the following elements:
-# 0              : inputEntry (relative to base project directory),
-# 1 [optional]   : string to be evaluated to modify output filename,
-# 2..n [optional]: string to be evaluated to modify each line.
-#
-# Non-exhaustive, but safe list of available variables for the evaluation strings:
-# $appProjectName: supplied as a mandatory argument,
-# $suffix        : supplied by --suffix argument, defaults to 'aartesting',
-# $repository    : generated from --repository argument, contains either 'mavenLocal()' or 'maven { url 'https://www.example.org' }',
-# $version       : output from getVersion script, '3.0.2' is valid content,
-# $inputFile     : absolute path to the input file,
-# $outputFile    : absolute path the output file, Java files may want to modify it,
-# $_             : current line during file modification.
-my @inputs = (
-    ['gradle'], ['gradlew'], ['gradle.properties'],
-    ['build.gradle', '', 's@//#STAGING-REPOSITORY#@$repository@'],
-
-    ['settings.gradle', '',
-        's/[\"\']\:tmpfile[\"\'], //',
-        's/^(rootProject\.name\s*=\s*[\"\'].+)([\"\'])$/${1}-aar-testing${2}/'],
-
-    ["$appProjectName/build.gradle", '',
-        's/(implementation\s+[\"\']com\.viliussutkus89\:tmpfile\-android\:).+([\"\'])/$1$version$2/'],
-
-    ["$appProjectName/src"]
-);
-
-sub parseArguments {
-    use Getopt::Long;
-    my $help;
-    GetOptions('repository=s' => \$repository, 'output=s' => \$outputDirectory, 'help' => \$help);
-    if (defined $help) {
-        usage();
-    }
-    $rootDirectory = shift @ARGV or do {
-        print STDERR "Missing mandatory argument appRootDirectory!\n";
-        usage();
-    };
-    $appProjectName = shift @ARGV or do {
-        print STDERR "Missing mandatory argument sampleAppProjectName!\n";
-        usage();
-    };
-
-    $rootDirectory = getAbsolutePath($rootDirectory, 1);
-    my $sampleAppModuleDirectory = $rootDirectory . '/' . $appProjectName;
-    -e $sampleAppModuleDirectory || die("Android project $appProjectName not found in root directory $rootDirectory!\n");
-
-    if ($repository eq 'mavenLocal') {
-        $repository = 'mavenLocal()';
-    } elsif (index($repository, 'https://') == 0 || index($repository, 'http://') == 0) {
-        $repository = "maven { url '${repository}' }";
-    } else {
-        print STDERR "Malformed repository: ${repository}!\n";
-        usage();
-    }
-
-    $outputDirectory = getAbsolutePath($outputDirectory, 0);
-    -e $outputDirectory && die("Output directory $outputDirectory already exists!\n");
-}
+use File::Basename 'dirname';
+use Getopt::Long;
+use lib dirname(__FILE__);
+use fileUpdater;
+use getVersion;
+use repositoryInputParser;
 
 sub usage {
-    print STDERR './', File::Basename::basename($0) , " rootDirectory appProjectName [--repository=mavenLocal] [--output=build/staging-app]\n";
+    print STDERR './', File::Basename::basename(__FILE__), " rootDirectory appProjectName [--repository=mavenLocal] [--output=build/staging-app]\n";
     print STDERR "\tMandatory: rootDirectory is the root directory containing the app. Absolute or relative.\n";
     print STDERR "\tMandatory: appProjectName is the android app project in the rootDirectory.\n";
     print STDERR "\tOptional: repository can be either mavenLocal or https://www.example.org.\n";
     print STDERR "\tOptional: output is the path of generated output. Absolute or relative.\n";
     exit 1;
 }
-###########################################################################################
-### ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ # ~Config~ #
-###########################################################################################
 
-sub parseVersion {
-    my $getVersionScript = getAbsolutePath(File::Basename::dirname($0) . '/getVersion', 1);
-    chomp ($version = `$getVersionScript`);
+my ($rootDirectory, $appProjectName, $help);
+my $repository = 'mavenLocal';
+my $outputDirectory = 'build/staging-app';
+my $version = getVersion();
+my $appVersion = $version . '-STAGING';
+
+Getopt::Long::GetOptions('repository=s' => \$repository, 'output=s' => \$outputDirectory, 'help' => \$help);
+if (defined $help) {
+    usage();
 }
+$rootDirectory = shift @ARGV or do {
+    print STDERR "Missing mandatory argument rootDirectory!\n";
+    usage();
+};
+$appProjectName = shift @ARGV or do {
+    print STDERR "Missing mandatory argument appProjectName!\n";
+    usage();
+};
+-e "${rootDirectory}/${appProjectName}" || die("Project $appProjectName was not found in root directory $rootDirectory!\n");
+$repository = repositoryInputParser::parseRepository($repository) or usage();
 
-sub getAbsolutePath {
-    use Cwd qw/abs_path getcwd/;
+my $sampleAppStaging = fileUpdater->new({
+    rootDirectory   => $rootDirectory,
+    outputDirectory => $outputDirectory
+});
 
-    my $path = shift;
-    my $doResolve = shift;
+$sampleAppStaging->update([ 'gradle', 'gradlew', 'gradle.properties' ]);
+$sampleAppStaging->update('build.gradle', sub {
+    $_ = shift;
+    s/\/\/#STAGING-REPOSITORY#/$repository/;
+    return $_;
+});
+$sampleAppStaging->update('settings.gradle', sub {
+    $_ = shift;
+    s/^(rootProject\.name\s*=\s*[\"\'].+)([\"\'])$/${1}-staging-aar${2}/;
+    return $_;
+});
 
-    # Implementation taken from
-    # https://stackoverflow.com/questions/39275327/check-if-a-directory-exists-as-an-absolute-path/39275654#39275654
-    if ($path =~ /^~/) {
-        $path =~ s/^~/$ENV{"HOME"}/;
-    }
-    if ($path !~ m#^/#) {
-        $path = Cwd::getcwd . '/' . $path;
-    }
+$sampleAppStaging->update($appProjectName, undef, sub {
+    $_ = shift;
+    return /$appProjectName\/build\.gradle$/ ? undef : $_;
+});
 
-    if ($doResolve) {
-        # Cwd::abs_path() does not work on non-existent paths
-        my $pathResolved = Cwd::abs_path($path);
-        if (!$pathResolved || ! -e $path) {
-            die "Failed to resolve path: ${path}!\n";
-        }
-        $path = $pathResolved;
-    }
+$sampleAppStaging->update("$appProjectName/build.gradle", sub {
+    $_ = shift;
+    s/(versionName\s+["']).+(["'])/${1}${appVersion}${2}/;
+    s/(implementation\s+["']com\.viliussutkus89:tmpfile-android:).+(["'])/${1}${version}${2}/;
+    return $_;
+});
 
-    return $path;
-}
 
-use File::Path 'make_path';
-sub processFile {
-    my $inputFile = shift;
-    my $outputFile = $outputDirectory . '/' . substr($inputFile, length($rootDirectory) + 1);
-
-    # Evaluated expression needed to change output filename
-    eval shift if (@_);
-
-    my @updateExpressions = @_;
-
-    open(my $FH_INPUT, '<', $inputFile) or die "$! : $inputFile\n";
-    File::Path::make_path(File::Basename::dirname($outputFile), { chmod => 0755 } );
-    open(my $FH_OUTPUT, '>', $outputFile) or die "$! : $outputFile\n";
-    while(<$FH_INPUT>) {
-        foreach my $expr (@updateExpressions) {
-            eval $expr;
-        }
-        print $FH_OUTPUT $_;
-    }
-
-    my $mode = (stat($FH_INPUT))[2] & 07777;
-    close($FH_INPUT);
-    chmod($mode, $FH_OUTPUT);
-    close($FH_OUTPUT);
-}
-
-use File::Find;
-foreach my $item (@inputs) {
-    my $inputItem = getAbsolutePath($rootDirectory . '/' . shift(@$item), 1);
-    -e $inputItem || die("Input '$inputItem does not exist!\n");
-
-    my $callback = sub {
-        if (-d $File::Find::name) {
-            return;
-        }
-        processFile($File::Find::name, @$item);
-    };
-
-    if (-d _) {
-        find($callback, $inputItem);
-    } else {
-        processFile($inputItem, @$item)
-    }
-}
