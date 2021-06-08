@@ -3,9 +3,9 @@ on:
   push:
     branches: [ master, main ]
     paths-ignore: '**.md'
-#  pull_request:
-#    branches: [ '**' ]
-#   paths-ignore: '**.md'
+  pull_request:
+    branches: [ '**' ]
+    paths-ignore: '**.md'
 
 env:
   ANDROID_NDK:    "22.1.7171670"
@@ -42,34 +42,6 @@ jobs:
 
       - run: ./gradlew assembleRelease
 
-      # Save output from Sonatype repo init
-      - name: 'Publish to Sonatype'
-        if: github.event.ref == 'refs/heads/master' || github.event.ref == 'refs/heads/main'
-        run: ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
-        shell: bash #pipefail needed for tee
-        env:
-          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
-          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
-          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-          SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
-
-      - name: 'Parse Sonatype repository'
-        id: sonatype
-        # Created staging repository 'comviliussutkus89-1055' at https://oss.sonatype.org/service/local/repositories/comviliussutkus89-1055/content/
-        # .(.+). should be '(.+)', to match 'comviliussutkus89-1055', but we already far too deep in qoutes for a simple \' to work.
-        run: perl -ne 'print "::set-output name=stagingRepo::$2\n::set-output name=stagingRepoUri::$3\n::warning ::$1\n" if /^(Created staging repository .(.+). at (.+))$/' < publishToSonatype.log
-
-      - run: ./scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=${{ steps.sonatype.outputs.stagingRepoUri }}
-
-      - name: Build sample app from staging library
-        run: ./gradlew build
-        working-directory: build/sampleapp-staging
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: sampleapp-staging
-          path: build/sampleapp-staging/app/build/outputs/apk/debug/app-debug.apk
-
       - run: ./gradlew publishToMavenLocal
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
@@ -80,12 +52,59 @@ jobs:
           name: maven-local
           path: ~/.m2
 
+      #########################################################################
+      # if ($Environment == BuildWithDeployToSonatype) { ### ### ### ### ### ##
+      #########################################################################
+      - name: 'Publish to Sonatype'
+        if: github.event.ref == 'refs/heads/master' || github.event.ref == 'refs/heads/main'
+        run: ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
+        # bash has pipefail on by default, which is needed for tee to fail, if gradle fails
+        shell: bash
+        env:
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
+
+      - name: 'Parse Sonatype repository'
+        if: github.event.ref == 'refs/heads/master' || github.event.ref == 'refs/heads/main'
+        id: sonatype
+        # publishToSonatype.log contains a line looking like this:
+        # Created staging repository 'comviliussutkus89-1055' at https://oss.sonatype.org/service/local/repositories/comviliussutkus89-1055/content/
+
+        # .(.+). should be '(.+)', to match 'comviliussutkus89-1055', but we already far too deep in qoutes for a simple \' to work.
+        run: perl -ne 'print "::set-output name=stagingRepo::$2\n::set-output name=stagingRepoUri::$3\n::warning ::$1\n" if /^(Created staging repository .(.+). at (.+))$/' < publishToSonatype.log
+
       # @TODO: add enhancement issue id for nexus plugin to skip this manual step
-      - run: echo "::warning ::Before pushing to Production you need to manually go to https://oss.sonatype.org/#stagingRepositories and release the staging repository named ${{ steps.sonatype.outputs.stagingRepo }}"
+      - name: Sonatype manual publish reminder
+        if: github.event.ref == 'refs/heads/master' || github.event.ref == 'refs/heads/main'
+        run: echo "::warning ::Before pushing to Production you need to manually go to https://oss.sonatype.org/#stagingRepositories and release the staging repository named ${{ steps.sonatype.outputs.stagingRepo }}"
+
+      - name: Prepare sample app for staging repository
+        if: github.event.ref == 'refs/heads/master' || github.event.ref == 'refs/heads/main'
+        run: ./scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=${{ steps.sonatype.outputs.stagingRepoUri }}
+      #########################################################################
+      # } else if ($Environment != BuildWithDeployToSonatype) { ### ### ### ###
+      #########################################################################
+      - name: Prepare sample app for staging repository
+        if: github.event.ref != 'refs/heads/master' && github.event.ref != 'refs/heads/main'
+        run: ./scripts/prepareSampleAppForStagingRepository sampleapp app --output=build/sampleapp-staging --repository=mavenLocal
+      #########################################################################
+      # } ### else if ($Environment != BuildWithDeployToSonatype); ### ### ## #
+      #########################################################################
+
+      - name: Build sample app from staging library
+        run: ./gradlew build
+        working-directory: build/sampleapp-staging
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sampleapp-staging
+          path: build/sampleapp-staging/app/build/outputs/apk/debug/app-debug.apk
 
   staging:
     needs: build
-    # Only macos VMs come with exposed CPU extensions to run hardware accelerated emulator
+    # Only macos VMs are available with exposed CPU extensions to run hardware accelerated emulator
     runs-on: macos-10.15
     strategy:
       fail-fast: false
@@ -115,7 +134,21 @@ jobs:
       - uses: android-actions/setup-android@v2
       - run: sdkmanager "ndk;${{env.ANDROID_NDK}}" "cmake;${{env.ANDROID_CMAKE}}"
 
-      - run: scripts/prepareAarInstrumentedTests tests --repository=${{ needs.build.outputs.STAGING_REPO_URI }} --output=build/aar-instrumented-tests
+      #########################################################################
+      # if ($Environment == BuildWithDeployToSonatype) { ### ### ### ### ### ##
+      #########################################################################
+      - name: Prepare AAR Instrumented Tests
+        if: github.event.ref == 'refs/heads/master' || github.event.ref == 'refs/heads/main'
+        run: scripts/prepareAarInstrumentedTests tests --output=build/aar-instrumented-tests --repository=${{ needs.build.outputs.STAGING_REPO_URI }}
+      #########################################################################
+      # } else if ($Environment != BuildWithDeployToSonatype) { ### ### ### ###
+      #########################################################################
+      - name: Prepare AAR Instrumented Tests
+        if: github.event.ref != 'refs/heads/master' && github.event.ref != 'refs/heads/main'
+        run: scripts/prepareAarInstrumentedTests tests --output=build/aar-instrumented-tests --repository=mavenLocal
+      #########################################################################
+      # } ### else if ($Environment != BuildWithDeployToSonatype); ### ### ## #
+      #########################################################################
 
       - run: ./gradlew assemble
         working-directory: build/aar-instrumented-tests
