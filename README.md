@@ -1,7 +1,6 @@
 # tmpfile-Android
 
-[![Download](https://maven-badges.herokuapp.com/maven-central/com.viliussutkus89/tmpfile-android/badge.svg)](https://search.maven.org/artifact/com.viliussutkus89/tmpfile-android)
-
+[![Maven Central](https://img.shields.io/maven-central/v/com.viliussutkus89/tmpfile-android.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.viliussutkus89%20AND%20a:tmpfile-android)
 
 POSIX C library provides [`FILE *tmpfile(void)`](https://linux.die.net/man/3/tmpfile) function.
 > The **tmpfile()** function opens a unique temporary file in binary read/write (w+b) mode.  
