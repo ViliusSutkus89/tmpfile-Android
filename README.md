@@ -69,7 +69,7 @@ Prefab support requires Android Gradle Plugin 4 or newer.
 ```gradle
 dependencies {
     // ...
-    implementation 'com.viliussutkus89:tmpfile-android:3.0.2'
+    implementation 'com.viliussutkus89:tmpfile-android:3.0.4'
 }
 ```
 
