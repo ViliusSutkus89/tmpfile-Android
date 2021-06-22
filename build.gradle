@@ -29,7 +29,7 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-version = '3.0.3'
+version = '3.0.4'
 group = 'com.viliussutkus89'
 
 nexusPublishing {
