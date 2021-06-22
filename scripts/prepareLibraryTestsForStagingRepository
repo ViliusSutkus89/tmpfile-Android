@@ -65,8 +65,8 @@ $aarStaging->update('settings.gradle', sub {
 
 $aarStaging->update("$projectName/build.gradle", sub {
     $_ = shift;
-    s@//#UNCOMMENT-WHEN-AAR-TESTING#@@;
-    s@#AAR-TESTING-VERSION#@$version@;
+    s@//#UNCOMMENT-DURING-STAGING#@@;
+    s@#STAGING-VERSION#@$version@;
     return $_;
 });
 

@@ -68,7 +68,15 @@ $sampleAppStaging->update('settings.gradle', sub {
 
 $sampleAppStaging->update($appProjectName, undef, sub {
     $_ = shift;
-    return /$appProjectName\/build\.gradle$/ ? undef : $_;
+    # Exclude sampleapp/app/build/
+    if (/$appProjectName\/build\//) {
+        return undef;
+    }
+    # Exclude sampleapp/app/build.gradle, because it will be added by the next update call
+    if (/$appProjectName\/build\.gradle$/) {
+        return undef;
+    }
+    return $_;
 });
 
 $sampleAppStaging->update("$appProjectName/build.gradle", sub {
@@ -77,5 +85,3 @@ $sampleAppStaging->update("$appProjectName/build.gradle", sub {
     s/(implementation\s+["']com\.viliussutkus89:tmpfile-android:).+(["'])/${1}${version}${2}/;
     return $_;
 });
-
-
