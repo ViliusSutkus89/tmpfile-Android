@@ -64,7 +64,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: library-lint-report
-          path: lib/build/reports/lint-results-release.html
+          path: tmpfile/build/reports/lint-results-release.html
 
       - name: Publish to Sonatype
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository | tee publishToSonatype.log
@@ -172,8 +172,8 @@ jobs:
             adb shell screencap /data/local/tmp/afterTests.png
             adb pull /data/local/tmp/afterTests.png testResults/screenshots/
 
-            mv lib/build/reports/androidTests/connected testResults/
-            mv lib/build/outputs/androidTest-results testResults/
+            mv tests/build/reports/androidTests/connected testResults/
+            mv tests/build/outputs/androidTest-results testResults/
 
             test ! -f sorry_but_tests_are_failing
 
