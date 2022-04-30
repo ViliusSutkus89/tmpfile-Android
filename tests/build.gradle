@@ -13,7 +13,6 @@ android {
     buildFeatures.prefab true
 }
 
-//#UNCOMMENT-DURING-STAGING#/*
 tasks.whenTaskAdded {
     switch (it.name) {
     case "preDebugBuild":
@@ -24,15 +23,10 @@ tasks.whenTaskAdded {
         break;
     }
 }
-//#UNCOMMENT-DURING-STAGING#*/
 
 dependencies {
-    //#UNCOMMENT-DURING-STAGING#/*
     implementation project(":tmpfile")
-    //#UNCOMMENT-DURING-STAGING#*/
-    //#UNCOMMENT-DURING-STAGING#implementation 'com.viliussutkus89:tmpfile-android:#STAGING-VERSION#'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
-
