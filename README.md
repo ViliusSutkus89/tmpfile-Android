@@ -69,7 +69,7 @@ Prefab support requires Android Gradle Plugin 4 or newer.
 [project level build.gradle](sampleapp/app/build.gradle) contains code to load the library as a dependency in Gradle.
 ```gradle
 dependencies {
-    implementation 'com.viliussutkus89:tmpfile-android:3.0.4'
+    implementation 'com.viliussutkus89:tmpfile-android:3.0.5'
 }
 ```
 
