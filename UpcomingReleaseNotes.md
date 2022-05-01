@@ -1,2 +1,0 @@
-- Rebuilt with NDK 23.1.7779620 (NDK 24 raises minimum API from 16 to 19)
-- Target SDK 32
