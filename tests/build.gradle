@@ -15,10 +15,10 @@ android {
 tasks.whenTaskAdded {
     switch (it.name) {
     case "preDebugBuild":
-        it.dependsOn ":tmpfile:prefabDebugPackage"
+        it.dependsOn ":tmpfile:prefabDebugConfigurePackage"
         break;
     case "preReleaseBuild":
-        it.dependsOn ":tmpfile:prefabReleasePackage"
+        it.dependsOn ":tmpfile:prefabReleaseConfigurePackage"
         break;
     }
 }
