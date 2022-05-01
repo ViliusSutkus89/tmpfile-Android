@@ -5,7 +5,7 @@ plugins {
 android {
     compileSdkVersion 32
     defaultConfig {
-        applicationId "com.viliussutkus89.tmpfile.sampleapp"
+        applicationId "com.viliussutkus89.android.tmpfile.sampleapp"
         minSdkVersion 16
         targetSdkVersion 32
         versionCode 21
@@ -23,6 +23,7 @@ android {
     buildFeatures {
         prefab true
     }
+
     if (System.getenv('APP_SIGNING_KEYFILE') && System.getenv('APP_SIGNING_ALIAS') && System.getenv('APP_SIGNING_PASS')) {
         signingConfigs {
             release {
