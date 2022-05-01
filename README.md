@@ -69,19 +69,7 @@ Prefab support requires Android Gradle Plugin 4 or newer.
 [project level build.gradle](sampleapp/app/build.gradle) contains code to load the library as a dependency in Gradle.
 ```gradle
 dependencies {
-    // ...
     implementation 'com.viliussutkus89:tmpfile-android:3.0.4'
-}
-```
-
-tmpfile-Android is distributed using [Maven Central](https://search.maven.org/artifact/com.viliussutkus89/tmpfile-android) repository.
-The repository needs to be added to the [top level build.gradle](sampleapp/build.gradle).
-```gradle
-allprojects {
-    repositories {
-        // ...
-        mavenCentral()
-    }
 }
 ```
 
@@ -96,7 +84,6 @@ target_link_libraries(YOUR_LIBRARY_NAME tmpfile::tmpfile)
 Previously mentioned `find_package(tmpfile REQUIRED CONFIG)` requires Prefab feature to be enabled in [project level build.gradle](sampleapp/app/build.gradle):
 ```groovy
 android {
-    // ...
     buildFeatures {
         prefab true
     }
