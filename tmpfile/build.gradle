@@ -17,7 +17,7 @@ android {
 
         consumerProguardFiles 'proguard-rules.pro'
     }
-    ndkVersion "22.1.7171670"
+    ndkVersion "23.1.7779620"
     externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
     defaultConfig.externalNativeBuild.cmake.arguments "-DANDROID_STL=none"
     packagingOptions.exclude("**libtmpfile.so")

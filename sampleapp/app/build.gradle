@@ -9,7 +9,7 @@ android {
         versionCode 19
         versionName '3.0.4'
     }
-    ndkVersion "22.1.7171670"
+    ndkVersion "23.1.7779620"
     externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
     buildTypes {
         release {
