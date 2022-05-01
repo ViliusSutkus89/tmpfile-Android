@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "com.viliussutkus89.tmpfile.sampleapp"
         minSdkVersion 16
-        targetSdkVersion 30
+        targetSdkVersion 32
         versionCode 19
         versionName '3.0.4'
     }

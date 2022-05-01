@@ -10,7 +10,7 @@ android {
     compileSdkVersion 32
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 30
+        targetSdkVersion 32
 
         versionCode 20
         versionName rootProject.version
