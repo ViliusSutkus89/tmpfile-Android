@@ -91,7 +91,7 @@ $sampleAppStaging->update('settings.gradle', sub {
 });
 
 # Add mavenLocal or Sonatype repository
-$sampleAppStaging->append('build.gradle', "allprojects { repositories { $repository } }");
+$sampleAppStaging->append('settings.gradle', "dependencyResolutionManagement.repositories { $repository }\n");
 
 # Copy app files
 $sampleAppStaging->update($appProjectName, undef, sub {
