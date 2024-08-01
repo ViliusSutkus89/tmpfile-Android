@@ -123,7 +123,7 @@ jobs:
         with:
           distribution: zulu
           java-version: 17
-      - uses: android-actions/setup-android@v4
+      - uses: android-actions/setup-android@v3
 
       - run: ./ci-scripts/prepareLibraryTestsForStagingRepository tests --output=build/lib-staging --repository=${{ needs.buildLibrary.outputs.STAGING_REPO_URL }}
 
