@@ -120,7 +120,7 @@ int CASE_write_and_readback_one_Meg() {
     std::unique_ptr<char[]> readBuffer(new char[length]);
 
     std::default_random_engine randomGenerator;
-    std::uniform_int_distribution<char> distribution(0, CHAR_MAX);
+    std::uniform_int_distribution<uint8_t> distribution(0, std::numeric_limits<uint8_t>::max());
 
     for (size_t i = 0; i < length; i++) {
         randomData[i] = distribution(randomGenerator);
@@ -156,7 +156,7 @@ int CASE_write_and_readback_sixty_four_Megs() {
     std::unique_ptr<char[]> readBuffer(new char[length]);
 
     std::default_random_engine randomGenerator;
-    std::uniform_int_distribution<char> distribution(0, CHAR_MAX);
+    std::uniform_int_distribution<uint8_t> distribution(0, std::numeric_limits<uint8_t>::max());
 
     for (size_t i = 0; i < length; i++) {
         randomData[i] = distribution(randomGenerator);
