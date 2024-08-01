@@ -1,9 +1,9 @@
 /*
- * tmpfile.cpp
+ * tmpfile.c
  *
  * tmpfile function overload for broken implementations.
  *
- * Copyright (C) 2019 - 2021 Vilius Sutkus'89
+ * Copyright (C) 2019 - 2021, 2024 Vilius Sutkus'89
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ static bool s_is_jni = false;
 // 1: set by JNI call to set_cache_dir
 // 2: obtained from environment variable TMPDIR
 // 3: /data/local/tmp
-static const char *choose_tmpfile_directory() {
+static const char *choose_tmpfile_directory(void) {
   const char *tmpfile_directory;
   if (atomic_load_explicit(&s_tmpfile_directory_is_set, memory_order_acquire)) {
     tmpfile_directory = s_tmpfile_directory;
@@ -141,7 +141,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, __attribute__((unused)) void *reserved) {
   return JNI_VERSION_1_6;
 }
 
-JNIEXPORT FILE *tmpfile() {
+JNIEXPORT FILE *tmpfile(void) {
   char *tmpfile_path = strcat_path_array((const char *[]) { choose_tmpfile_directory(),
                                                             "/" c_filename_template, NULL});
   if (NULL == tmpfile_path) {
