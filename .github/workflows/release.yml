@@ -46,7 +46,7 @@ permissions:
 jobs:
   releaseSonatype:
     environment: SonatypeAccess
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       ARTIFACTS: ${{ steps.promote.outputs.artifacts }}
     steps:
@@ -65,7 +65,7 @@ jobs:
       contents: write
     outputs:
       RELEASE_TAG: "v${{ steps.updateDownstreamVersion.outputs.version }}"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -112,16 +112,16 @@ jobs:
     permissions:
       # Permission needed to attach artifact to GitHub release.
       contents: write
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: refs/tags/${{ needs.releaseGitHub.outputs.RELEASE_TAG }}
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: zulu
-          java-version: 11
-      - uses: android-actions/setup-android@v2
+          java-version: 17
+      - uses: android-actions/setup-android@v3
 
       - id: decodeSampleAppKeystore
         run: |
@@ -153,9 +153,9 @@ jobs:
     needs: buildSampleApp
     permissions:
       contents: write
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.ref }}
 
