@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 android {
-    namespace = "com.viliussutkus89.android.tmpfile"
+    namespace = "com.viliussutkus89.android.tmpfile.tests"
     compileSdk 35
     defaultConfig {
         minSdkVersion 16
