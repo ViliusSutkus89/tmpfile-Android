@@ -90,3 +90,10 @@ afterEvaluate {
         }
     }
 }
+
+tasks.named("clean") {
+    def dotCxxDir = layout.projectDirectory.dir(".cxx")
+    doFirst {
+        delete dotCxxDir
+    }
+}
