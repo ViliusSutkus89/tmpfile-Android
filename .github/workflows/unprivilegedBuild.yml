@@ -76,8 +76,7 @@ jobs:
 
   runInstrumentedTests:
     needs: buildLibrary
-    # Only macos VMs are available with exposed CPU extensions to run hardware accelerated emulator
-    runs-on: macos-11
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -113,6 +112,12 @@ jobs:
 
       - name: Prepare library to run instrumented tests on staging library
         run: ./ci-scripts/prepareLibraryTestsForStagingRepository tests --output=build/lib-staging --repository=mavenLocal
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
 
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2
