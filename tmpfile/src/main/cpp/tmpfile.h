@@ -1,5 +1,5 @@
 /*
- * Tmpfile.java
+ * tmpfile.h
  *
  * tmpfile function overload for broken implementations.
  *
@@ -17,31 +17,29 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
-package com.viliussutkus89.android.tmpfile;
+#pragma once
 
-import androidx.annotation.NonNull;
-import java.io.File;
+#include <stdio.h>
+#include <stdbool.h>
+#include <android/log.h>
 
-public final class Tmpfile {
-  static {
-    System.loadLibrary("tmpfile");
-  }
+const char *choose_tmpfile_directory(void);
+void set_tmpfile_directory(const char *tmpfile_dir);
 
-  public static void init(@NonNull File cacheDir) {
-    File tmpfile_dir = new File(cacheDir, "tmpfile");
-    set_tmpfile_dir(tmpfile_dir.getAbsolutePath());
-    getTmpfileDir().mkdirs();
-  }
+extern bool s_is_jni;
 
-  private static native void set_tmpfile_dir(String tmpfile_dir);
-
-  private static native String get_tmpfile_dir_path();
-
-  public static File getTmpfileDir() {
-    return new File(get_tmpfile_dir_path());
-  }
-
-  public static native boolean self_test();
+#define LOG(LOG_LEVEL, ...) if (s_is_jni) { \
+  __android_log_print(LOG_LEVEL, "tmpfile", __VA_ARGS__); \
+} else {                                                          \
+    printf(__VA_ARGS__);                                          \
 }
+
+#define LOGE(...) LOG(ANDROID_LOG_ERROR, __VA_ARGS__)
+
+#ifdef NDEBUG
+#define LOGD(...) {}
+#else
+#define LOGD(...) LOG(ANDROID_LOG_DEBUG, __VA_ARGS__)
+#endif
