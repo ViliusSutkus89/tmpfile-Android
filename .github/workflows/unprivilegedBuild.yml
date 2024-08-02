@@ -82,7 +82,7 @@ jobs:
       matrix:
         include:
           - {'api-level': 35, 'api-type-target': 'google_apis', 'arch': 'x86_64'}
-          - {'api-level': 34, 'api-type-target': 'aosp_atd', 'arch': 'x86_64'}
+          - {'api-level': 34, 'api-type-target': 'default', 'arch': 'x86_64'}
           - {'api-level': 33, 'api-type-target': 'aosp_atd', 'arch': 'x86_64'}
           - {'api-level': 32, 'api-type-target': 'aosp_atd', 'arch': 'x86_64'}
           - {'api-level': 31, 'api-type-target': 'aosp_atd', 'arch': 'x86_64'}
