@@ -89,7 +89,7 @@ jobs:
 
       # Tar the maven-local dir, to attach as a single file to GitHub Release
       - run: tar -cvf maven-local.tar ~/.m2
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: maven-local.tar
           path: maven-local.tar
@@ -182,7 +182,7 @@ jobs:
 
             test ! -f sorry_but_tests_are_failing
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: testResults-${{ matrix.api-level }}-${{ matrix.arch }}-${{ matrix.api-type-target }}
