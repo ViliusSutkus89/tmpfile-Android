@@ -13,7 +13,7 @@ android {
         minSdkVersion 16
         targetSdk 35
 
-        versionCode 120
+        versionCode 220
         versionName rootProject.version
 
         archivesBaseName = rootProject.name
