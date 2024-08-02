@@ -8,8 +8,8 @@ android {
         applicationId "com.viliussutkus89.android.tmpfile.sampleapp"
         minSdkVersion 16
         targetSdk 35
-        versionCode 21
-        versionName '3.0.5.1'
+        versionCode 120
+        versionName '3.0.6.1'
     }
     ndkVersion "23.1.7779620"
     externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
@@ -39,7 +39,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.viliussutkus89:tmpfile-android:3.0.5'
+    implementation 'com.viliussutkus89:tmpfile-android:3.0.6'
     implementation 'androidx.appcompat:appcompat:1.6.1'
 }
 
