@@ -67,7 +67,7 @@ jobs:
       RELEASE_TAG: "v${{ steps.updateDownstreamVersion.outputs.version }}"
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # A branch is required for post release version increment commit
           ref: ${{ github.event.ref }}
