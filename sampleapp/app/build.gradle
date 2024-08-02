@@ -8,8 +8,8 @@ android {
         applicationId "com.viliussutkus89.android.tmpfile.sampleapp"
         minSdkVersion 16
         targetSdk 35
-        versionCode 120
-        versionName '3.0.6.1'
+        versionCode 121
+        versionName '3.0.6.2'
     }
     ndkVersion "23.1.7779620"
     externalNativeBuild.cmake.path "src/main/cpp/CMakeLists.txt"
