@@ -27,8 +27,10 @@ tasks.whenTaskAdded {
 dependencies {
     implementation project(":tmpfile")
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    // androidx.test.ext:junit:1.1.5 requires minSdk 19
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    // androidx.test.espresso:espresso-core:3.6.0 requires minSdk 19
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
 
 tasks.named("clean") {
