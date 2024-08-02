@@ -23,6 +23,7 @@ android {
     buildFeatures {
         prefab true
     }
+    namespace 'com.viliussutkus89.android.tmpfile.sampleapp'
 
     if (System.getenv('APP_SIGNING_KEYFILE') && System.getenv('APP_SIGNING_ALIAS') && System.getenv('APP_SIGNING_PASS')) {
         signingConfigs {
