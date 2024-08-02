@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
+    compileSdk 35
     defaultConfig {
         applicationId "com.viliussutkus89.android.tmpfile.sampleapp"
         minSdkVersion 16
-        targetSdkVersion 32
+        targetSdk 35
         versionCode 21
         versionName '3.0.5.1'
     }
