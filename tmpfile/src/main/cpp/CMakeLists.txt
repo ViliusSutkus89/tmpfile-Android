@@ -24,3 +24,5 @@ add_library(tmpfile ${TMPFILE_SOURCES})
 
 find_library(log-lib log)
 target_link_libraries(tmpfile ${log-lib})
+
+install(TARGETS tmpfile)
